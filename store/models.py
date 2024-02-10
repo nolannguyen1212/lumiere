@@ -1,5 +1,15 @@
 from django.db import models
+from enum import Enum
 from authen.models import User
+
+class GenderType(Enum):
+    male = ("M", "Male")
+    female = ("FM", "Female")
+    none = ("N", "None")
+
+    @classmethod
+    def get_choices(cls):
+        return [(status.value[0], status.value[1]) for status in cls]
 
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
@@ -64,6 +74,26 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
+class UserInfo(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    firstname = models.CharField(max_length=50)
+    lastname = models.CharField(max_length=50)
+    date_of_birth = models.CharField(max_length=50, default=None, null=True, blank=True)
+    gender = models.CharField(max_length=50, choices=GenderType.get_choices())
+    email = models.CharField(max_length=50)
+    phone = models.CharField(max_length=10)
+
+    home_address = models.CharField(max_length=50, default="")
+    home_number = models.CharField(max_length=50, default="")
+    city = models.CharField(max_length=50, default="")
+    state = models.CharField(max_length=50, default="")
+    zip = models.CharField(max_length=50, default="")
+
+    bankname = models.CharField(max_length=50, default="")
+    account_holder = models.CharField(max_length=50, default="")
+    account_number = models.CharField(max_length=20, default="")
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(

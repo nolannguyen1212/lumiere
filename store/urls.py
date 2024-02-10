@@ -11,4 +11,5 @@ urlpatterns = [
     path("products/<int:id>", view=views.ProductView.as_view(), name="product-view"),
     path("orders", view=views.OrderViewset.as_view({"get": "get", "post": "post"}), name="order-view"),
     path("order-items", view=views.OrderItemView.as_view(), name="order-item-view"),
+    path("info", view=views.UserInfoView.as_view(), name="user-info"),
 ]

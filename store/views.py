@@ -2,9 +2,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.decorators import action, authentication_classes, permission_classes
-from .models import User, Product, Order, OrderItem
-from .serializers import ProductSerializer, OrderSerializer, OrderItemSerializer
+from rest_framework.decorators import (
+    action, 
+    authentication_classes, 
+    permission_classes
+)
+from .models import (
+    User, 
+    Product, 
+    Order, 
+    OrderItem, 
+    UserInfo
+)
+from .serializers import (
+    ProductSerializer, 
+    OrderSerializer, 
+    OrderItemSerializer, 
+    UserInfoSerializer
+)
 
 # Create your views here.
 
@@ -138,4 +153,42 @@ class OrderItemView(APIView):
             return Response({ "message": f"Successfully remove order items" }, status=200)
         except:
             return Response({ "error": "This item is" })
-        
+
+class UserInfoView(APIView):
+
+    def get(self, request):
+        req_user = request.user
+        user_info = UserInfo.objects.filter(user=req_user).first()
+        serializer = UserInfoSerializer(user_info)
+        return Response({ "user_info": serializer.data }, status=200)
+
+    def post(self, request):
+        data = request.data
+        req_user = request.user
+
+        try:
+            user_info, created = UserInfo.objects.get_or_create(user=req_user)
+        except UserInfo.DoesNotExist:
+            return Response({"error": "User info not found"}, status=404)
+
+        user_info.firstname = data.get('firstname')
+        user_info.lastname = data.get('lastname')
+        user_info.date_of_birth = data.get('date_of_birth')
+        user_info.gender = data.get('gender')
+        user_info.email = data.get('email')
+        user_info.phone = data.get('phone')
+
+        user_info.home_address = data.get('home_address')
+        user_info.home_number = data.get('home_number')
+        user_info.city = data.get('city')
+        user_info.state = data.get('state')
+        user_info.zip = data.get('zip')
+
+        user_info.bankname = data.get('bankname')
+        user_info.account_holder = data.get('account_holder')
+        user_info.account_number = data.get('account_number')
+    
+        user_info.save()
+
+        serializer = UserInfoSerializer(user_info)
+        return Response(serializer.data, status=200)

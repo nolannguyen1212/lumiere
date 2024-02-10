@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import (
-    Product, Order, OrderItem
+    Product, Order, 
+    OrderItem, UserInfo
 )
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -35,3 +36,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
     
     def get_order(self, obj):
         return obj.order
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserInfo
+        fields = "__all__"
