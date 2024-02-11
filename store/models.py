@@ -17,6 +17,8 @@ class Product(models.Model):
     digital = models.BooleanField(default=False, null=True, blank=False)
     image = models.ImageField(null=True, blank=True)
     imageUploadURL = models.CharField(max_length=255, null=True, blank=True)
+    instock = models.BooleanField(default=True)
+    description = models.TextField(default="")
     updatedBy = models.CharField(max_length=200, null=False)
 
     def __str__(self) -> str:
