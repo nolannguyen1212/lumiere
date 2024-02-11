@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "authen",
+    "payment",
     "store",
 ]
 
@@ -146,6 +147,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
+
+SITE_URL = os.getenv("SITE_URL")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=60),
