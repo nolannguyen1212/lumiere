@@ -12,10 +12,15 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class PaymentView(APIView):
     def post(self, request, *args, **kwargs):
+        data = request.data
+        amount = data.get('amount')
         try:
             intent = stripe.PaymentIntent.create(
-                amount=request.data['amount'],
+                amount=amount,
                 currency='usd',
+                automatic_payment_methods={
+                    'enabled': True,
+                },
             )
             return Response({'clientSecret': intent.client_secret}, status=status.HTTP_200_OK)
         except Exception as e:
