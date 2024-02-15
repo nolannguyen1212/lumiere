@@ -10,6 +10,8 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class OrderSerializer(serializers.ModelSerializer):
+    formatted_date_ordered = serializers.CharField(source='formatted_date_ordered', read_only=True)
+
     class Meta:
         model = Order
         fields = "__all__"

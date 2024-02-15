@@ -1,6 +1,7 @@
 from django.db import models
 from enum import Enum
 from authen.models import User
+import uuid
 
 class GenderType(Enum):
     male = ("M", "Male")
@@ -37,9 +38,9 @@ class Order(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
-    date_ordered = models.DateTimeField(auto_now_add=True)
+    # date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
-    transaction_id = models.CharField(max_length=200, null=True)
+    transaction_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self) -> str:
         return str(self.id)
@@ -66,6 +67,10 @@ class Order(models.Model):
         orderitems = self.orderitem_set.all()
         total = sum([item.quantity for item in orderitems])
         return total
+
+    @property
+    def formatted_date_ordered(self):
+        return self.date_ordered.strftime('%Y-%m-%d %H:%M:%S') if self.date_ordered else None
 
 
 class OrderItem(models.Model):

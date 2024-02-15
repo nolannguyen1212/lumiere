@@ -62,6 +62,8 @@ class StoreProductsView(APIView):
 
 
 class ProductView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request, id):
         try:
             product = Product.objects.get(pk=id)
@@ -95,6 +97,16 @@ class OrderViewset(viewsets.ViewSet):
             },
             status=200,
         )
+
+    def put(self, request):
+        req_user = request.user
+        try: 
+            order = Order.objects.get(user=req_user, complete=False)
+            order.complete = True
+            order.save()
+            return Response({"message": "Successfully Save Order!"}, status=200)
+        except Exception as error:
+            return Response({ "error": error }, status=404)
 
     @action(detail=False, methods=["GET"], url_path="userid/(?P<user_id>[^/.]+)")
     def get_by_userid(self, request, user_id):
