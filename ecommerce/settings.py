@@ -35,10 +35,12 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ['https://enwcoin.onrender.com', 'https://enwcoin.onrender.com/*']
 
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_soft.apps.AdminSoftDashboardConfig", # for admin theme
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
