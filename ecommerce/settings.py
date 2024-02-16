@@ -19,8 +19,8 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-ALLOW_ANONYMOUS = True
-CSRF_COOKIE_SECURE = True
+# ALLOW_ANONYMOUS = True
+# CSRF_COOKIE_SECURE = True
 
 # DATE FORMAT
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
