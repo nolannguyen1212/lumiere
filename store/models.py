@@ -14,7 +14,7 @@ class GenderType(Enum):
 
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
-    price = models.DecimalField(max_digits=20, decimal_places=10)
+    price = models.DecimalField(max_digits=20, decimal_places=7)
     digital = models.BooleanField(default=False, null=True, blank=False)
     image = models.ImageField(null=True, blank=True)
     imageUploadURL = models.CharField(max_length=255, null=True, blank=True)
