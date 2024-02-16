@@ -1,4 +1,4 @@
-# SHOPIFY
+# ECOIN
 
 - This is an ecommerce website.
 - **Admin Site :** `Django` provide us a wonderful Admin Management Site.
