@@ -11,11 +11,13 @@
 
 ### How to update/view Product/Order
 
-- Open prisma studio
+- Open Admin Site
 
   ```
   python manage.py runserver
   ```
+
+- Access `BASE_URL/admin`.
 
 ## Architecture & Relate Packages
 
@@ -25,6 +27,7 @@
 - `Stripe` **(for payment)**
   > [!WARNING]
   > React Alert: `react-hot-toast`
+  > I use `ReacJS` for **Frontend**, so before deploying, **ReactJS** was exported.
 
 ## Requirements
 
