@@ -19,8 +19,6 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# ALLOW_ANONYMOUS = True
-# CSRF_COOKIE_SECURE = True
 
 # DATE FORMAT
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
@@ -37,7 +35,6 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-# CSRF_TRUSTED_ORIGINS = ['https://enwcoin.onrender.com', 'https://enwcoin.onrender.com/*']
 
 # Application definition
 
