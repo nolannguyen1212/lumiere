@@ -88,6 +88,13 @@
   $ python manage.py migrate
   ```
 - **Run the Application**
+
   ```
   $ python manage.py runserver
+  ```
+
+- **Run tests after updating modules**
+
+  ```
+  $ python manage.py test tests
   ```
