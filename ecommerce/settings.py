@@ -28,6 +28,7 @@ DATE_INPUT_FORMATS = ['%d-%m-%Y']
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
+PASSWORD_HASHED_DEFAULT = "$2b$12$P67M0FhlsEZHvTkCHvMXDuIYTJF3oCV1rGHcyxU5ZtdVnZqYJ4322"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -154,6 +155,7 @@ REST_FRAMEWORK = {
         # "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
 SITE_URL = os.getenv("SITE_URL")
