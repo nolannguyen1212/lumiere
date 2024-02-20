@@ -49,17 +49,21 @@ class StoreProductTest(APITestCase):
     def tearDown(self):
         Product.objects.filter(name="product_test").delete()
 
-    def test_api_without_perm(self):
+    def test_get_all_products_without_perm(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
         response = self.client.get("/api/products")
         self.assertEquals(response.status_code, 401)
-
 
     def test_get_all_products(self):
         response = self.client.get("/api/products")
         self.assertEquals(response.status_code, 200)
         data = response.data
         self.assertEquals(len(data), 1)
+
+    def test_get_a_product_without_perm(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
+        response = self.client.get(f"/api/products/{self.product.id}")
+        self.assertEquals(response.status_code, 401)
 
     def test_get_a_product(self):
         response = self.client.get(f"/api/products/{self.product.id}")

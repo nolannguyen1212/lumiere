@@ -96,5 +96,5 @@
 - **Run tests after updating modules**
 
   ```
-  $ python manage.py test tests
+  $ python manage.py test tests -v 2
   ```
