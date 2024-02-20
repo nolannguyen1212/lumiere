@@ -1,11 +1,8 @@
 name: execute tests
 run-name: tests execution
 on:
-  push:
-    branches: [master]
   pull_request:
-    branches:
-      - "*"
+    branches: [master]
 jobs:
   echo_header:
     runs-on: ubuntu-latest
