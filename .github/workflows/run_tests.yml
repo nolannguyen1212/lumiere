@@ -3,6 +3,9 @@ run-name: tests execution
 on:
   push:
     branches: [master]
+  pull_request:
+    branches:
+      - "*"
 jobs:
   echo_header:
     runs-on: ubuntu-latest
@@ -14,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
