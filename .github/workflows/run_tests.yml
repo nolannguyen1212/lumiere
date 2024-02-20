@@ -1,0 +1,11 @@
+name: execute tests
+run-name: tests execution
+on:
+  push:
+    branches: [master]
+jobs:
+  echo_header:
+    runs-on: ubuntu-lastest
+    steps:
+      - name: Echo Header
+        run: echo "Running Tests"
