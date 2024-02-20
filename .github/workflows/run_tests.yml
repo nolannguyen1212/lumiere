@@ -5,7 +5,7 @@ on:
     branches: [master]
 jobs:
   echo_header:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     steps:
       - name: Echo Header
         run: echo "Running Tests"
