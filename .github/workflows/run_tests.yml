@@ -21,15 +21,17 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install dependencies
+      - name: Setup Virtualenv
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pipenv
-          pipenv shell
-          pipenv install
+          pip install pipenv
+
+      - name: Install dependencies
+        run: |
+          pipenv install --dev
 
       - name: Run migrations
-        run: python manage.py migrate
+        run: pipenv run python manage.py migrate
 
       - name: Run tests
-        run: python manage.py test tests
+        run: pipenv run python manage.py test tests
