@@ -10,7 +10,8 @@ jobs:
       - name: Echo Header
         run: echo "Running Tests"
 
-  build:
+  run_tests:
+    needs: echo_header
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
