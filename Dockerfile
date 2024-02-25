@@ -11,5 +11,7 @@ COPY Pipfile.lock /app/
 RUN pipenv install --system
 
 COPY . /app/
+RUN chmod u+x docker-entrypoint.sh
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+EXPOSE 8080
+ENTRYPOINT ["./docker-entrypoint.sh"]
