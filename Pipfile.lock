@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e158673532c20dc16b41766a4e9056f9018b955ded2ebc3e84c393fc1b5518c5"
+            "sha256": "bb060407fff94305f71ee0a3809c4620c13a10d83b8363453e7fc8d26a0e8264"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -223,6 +223,22 @@
             "markers": "python_version >= '3.5'",
             "version": "==3.6"
         },
+        "mysqlclient": {
+            "hashes": [
+                "sha256:329e4eec086a2336fe3541f1ce095d87a6f169d1cc8ba7b04ac68bcb234c9711",
+                "sha256:33bc9fb3464e7d7c10b1eaf7336c5ff8f2a3d3b88bab432116ad2490beb3bf41",
+                "sha256:3c318755e06df599338dad7625f884b8a71fcf322a9939ef78c9b3db93e1de7a",
+                "sha256:4e80dcad884dd6e14949ac6daf769123223a52a6805345608bf49cdaf7bc8b3a",
+                "sha256:9d3310295cb682232cadc28abd172f406c718b9ada41d2371259098ae37779d3",
+                "sha256:9d4c015480c4a6b2b1602eccd9846103fc70606244788d04aa14b31c4bd1f0e2",
+                "sha256:ac44777eab0a66c14cb0d38965572f762e193ec2e5c0723bcd11319cc5b693c5",
+                "sha256:d43987bb9626096a302ca6ddcdd81feaeca65ced1d5fe892a6a66b808326aa54",
+                "sha256:e1ebe3f41d152d7cb7c265349fdb7f1eca86ccb0ca24a90036cde48e00ceb2ab"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==2.2.4"
+        },
         "packaging": {
             "hashes": [
                 "sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61",
@@ -337,12 +353,12 @@
         },
         "stripe": {
             "hashes": [
-                "sha256:3f867530d2e0b4b997d6001e5a7edaa5fdfbbc76414e65e806fc5f37703ede5b",
-                "sha256:e1a430723e6126b0240ff483249d8aa1b6c0ded29db0dc34e192e19af5b6049c"
+                "sha256:6d889b6a8a5351c561538d23f4726b2cf1b3dc2591fd579a5dab236558dd776f",
+                "sha256:7f5941814d13a62e9a77e19fe3242b5aafc3063bdd9be6ae3e5a288404e6de60"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6'",
-            "version": "==8.3.0"
+            "version": "==8.4.0"
         },
         "typing-extensions": {
             "hashes": [

@@ -18,6 +18,7 @@ djangorestframework-simplejwt = "*"
 bcrypt = "*"
 stripe = "*"
 django-admin-soft-dashboard = "*"
+mysqlclient = "*"
 
 [dev-packages]
 

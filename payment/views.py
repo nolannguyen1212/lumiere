@@ -16,7 +16,7 @@ class PaymentView(APIView):
         amount = data.get('amount')
         try:
             intent = stripe.PaymentIntent.create(
-                amount=amount,
+                amount=int(amount * 1000),
                 currency='usd',
                 automatic_payment_methods={
                     'enabled': True,
