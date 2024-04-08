@@ -4,21 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-asgiref = "==3.7.2"
-django = "==4.2.5"
-django-cors-headers = "==4.2.0"
-gunicorn = "==21.2.0"
-packaging = "==23.1"
-pillow = "==10.0.1"
-pyjwt = "==2.8.0"
+asgiref = "*"
+django = "*"
+django-cors-headers = "*"
+gunicorn = "*"
+packaging = "*"
+pillow = "*"
+pyjwt = "*"
 python-dotenv = "*"
-sqlparse = "==0.4.4"
+sqlparse = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 bcrypt = "*"
 stripe = "*"
 django-admin-soft-dashboard = "*"
-mysqlclient = "*"
 
 [dev-packages]
 
