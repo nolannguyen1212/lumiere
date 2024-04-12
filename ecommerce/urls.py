@@ -22,12 +22,6 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path("", include("frontend.urls")),
-    path("login", include("frontend.urls")),
-    path("signup", include("frontend.urls")),
-    path("orders/me", include("frontend.urls")),
-    path("settings", include("frontend.urls")),
-    path("products/<int:productId>", include("frontend.urls")),
     path("admin/", admin.site.urls),
     path("users/", include("authen.urls")),
     path("api/", include("store.urls")),

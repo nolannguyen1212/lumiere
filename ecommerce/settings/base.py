@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "authen",
     "payment",
     "store",
-    "frontend",
 ]
 
 MIDDLEWARE = [
