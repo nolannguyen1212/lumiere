@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import (
     action, 
     authentication_classes, 
@@ -23,14 +24,23 @@ from .serializers import (
 
 # Create your views here.
 
-
 class StoreProductsView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = PageNumberPagination
     
     def get(self, request):
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response({"products": serializer.data}, status=200)
+        pagination = PageNumberPagination()
+        try:
+            is_hot_saled = request.GET['is_hot_saled']
+            if is_hot_saled:
+                products = Product.objects.filter(isHotSaled=True).values()
+                pagination.page_size = 5
+        except:
+            products = Product.objects.all()
+            pagination.page_size = 15
+        page = pagination.paginate_queryset(products, request)
+        serializer = ProductSerializer(page, many=True)
+        return pagination.get_paginated_response(serializer.data)
 
     def post(self, request):
         user = request.user
