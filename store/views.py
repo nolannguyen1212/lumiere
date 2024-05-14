@@ -30,14 +30,24 @@ class StoreProductsView(APIView):
     
     def get(self, request):
         pagination = PageNumberPagination()
-        try:
-            is_hot_saled = request.GET['is_hot_saled']
-            if is_hot_saled:
-                products = Product.objects.filter(isHotSaled=True).values()
-                pagination.page_size = 5
-        except:
-            products = Product.objects.all()
+        data = request.GET
+        is_hot_saled = data.get('is_hot_saled')
+
+        if is_hot_saled:
+            products = Product.objects.filter(isHotSaled=True).values()
+            pagination.page_size = 5
+        else:
+            devices = data.get('devices')
+            brand = data.get('brand')
+            if devices:
+                products = Product.objects.filter(categories=devices)
+            elif brand:
+                products = Product.objects.filter(brand=brand)
+            else:
+                products = Product.objects.all()
+            
             pagination.page_size = 15
+
         page = pagination.paginate_queryset(products, request)
         serializer = ProductSerializer(page, many=True)
         return pagination.get_paginated_response(serializer.data)
