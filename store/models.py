@@ -26,6 +26,11 @@ class Product(models.Model):
     description = models.TextField(default="")
     updatedBy = models.CharField(max_length=200, null=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['name'], name='name_index_idx')
+        ]
+
     def __str__(self) -> str:
         return self.name
 

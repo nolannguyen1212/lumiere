@@ -39,13 +39,15 @@ class StoreProductsView(APIView):
         else:
             devices = data.get('devices')
             brand = data.get('brand')
+            name = data.get('name')
             if devices:
                 products = Product.objects.filter(categories=devices)
             elif brand:
                 products = Product.objects.filter(brand=brand)
             else:
                 products = Product.objects.all()
-            
+            if name:    
+                products = products.filter(name__icontains=name)
             pagination.page_size = 15
 
         page = pagination.paginate_queryset(products, request)
