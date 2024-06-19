@@ -1,4 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8080
+set -e
+
+pipenv run python manage.py migrate
+pipenv run python manage.py runserver 0.0.0.0:8080
