@@ -12,6 +12,18 @@ class GenderType(Enum):
     def get_choices(cls):
         return [(status.value[0], status.value[1]) for status in cls]
 
+class Brand(models.Model):
+    name = models.CharField(max_length=200, null=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+class Categories(models.Model):
+    name = models.CharField(max_length=200, null=True)
+
+    def __str__(self) -> str:
+        return self.name
+
 class Product(models.Model):
     name = models.CharField(max_length=200, null=True)
     price = models.DecimalField(max_digits=20, decimal_places=2)

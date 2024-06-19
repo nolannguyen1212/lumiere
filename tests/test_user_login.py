@@ -1,5 +1,5 @@
 from rest_framework.test import APITestCase
-from ecommerce import settings
+from django.conf import settings
 from authen.models import User
 
 class UserLoginTests(APITestCase):

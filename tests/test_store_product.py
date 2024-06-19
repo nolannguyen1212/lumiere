@@ -1,5 +1,5 @@
 import unittest
-from ecommerce import settings
+from django.conf import settings
 from authen.models import User
 from store.models import Product
 from rest_framework.test import APITestCase

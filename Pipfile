@@ -7,7 +7,7 @@ name = "pypi"
 asgiref = "==3.7.2"
 django = "==4.2.5"
 django-cors-headers = "==4.2.0"
-gunicorn = "==21.2.0"
+gunicorn = "*"
 packaging = "==23.1"
 pillow = "==10.0.1"
 pyjwt = "==2.8.0"
@@ -19,6 +19,7 @@ bcrypt = "*"
 stripe = "*"
 django-admin-soft-dashboard = "*"
 mysqlclient = "2.2.3"
+gevent = "*"
 
 [dev-packages]
 
