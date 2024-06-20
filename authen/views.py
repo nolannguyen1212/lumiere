@@ -14,6 +14,7 @@ from .models import User
 class Login(APIView):
     authentication_classes = []
     permission_classes = []
+    serializer_class = UserLoginSerializer
 
     def post(self, request):
         data = request.data
@@ -33,6 +34,7 @@ class Login(APIView):
 class Register(APIView):
     authentication_classes = []
     permission_classes = []
+    serializer_class = UserRegistrationSerializer
 
     def post(self, request):
         data = request.data
@@ -47,6 +49,8 @@ class Register(APIView):
             return Response({"errors": errors}, status=400)
 
 class UserView(APIView):
+    serializer_class = UserSerializer
+
     def get(self, request):
         user = request.user
         try:

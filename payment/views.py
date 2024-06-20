@@ -7,10 +7,22 @@ import stripe
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema
+from .serializers import PaymentSuccessedSerializer, PaymentFailedSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class PaymentView(APIView):
+    serializer_class = []
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: PaymentSuccessedSerializer,
+            500: PaymentFailedSerializer
+        },
+        description="Create a Stripe PaymentIntent and return the client secret."
+    )
     def post(self, request, *args, **kwargs):
         data = request.data
         amount = data.get('amount')

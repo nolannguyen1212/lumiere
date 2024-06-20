@@ -11,9 +11,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DATABASE_NAME", "ecoin"),
-        "USER": os.getenv("DATABASE_USER", "root"),
+        "USER": os.getenv("DATABASE_USER", "nova"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD", "password"),
-        "HOST": os.getenv("DATABASE_HOST", "localhost"),
+        "HOST": os.getenv("DATABASE_HOST", "mysql"),
         "PORT": os.getenv("DATABASE_PORT", 3306),
         "OPTIONS": {
             "init_command": "SET default_storage_engine=INNODB",

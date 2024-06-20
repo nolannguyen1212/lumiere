@@ -20,6 +20,7 @@ stripe = "*"
 django-admin-soft-dashboard = "*"
 mysqlclient = "2.2.3"
 gevent = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 

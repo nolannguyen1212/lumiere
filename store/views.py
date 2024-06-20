@@ -8,6 +8,12 @@ from rest_framework.decorators import (
     authentication_classes, 
     permission_classes
 )
+from drf_spectacular.utils import (
+    extend_schema, 
+    OpenApiParameter,
+    OpenApiTypes,
+    OpenApiResponse
+)
 from .models import (
     User, 
     Product, 
@@ -27,7 +33,13 @@ from .serializers import (
 class StoreProductsView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = PageNumberPagination
-    
+    serializer_class = ProductSerializer
+
+    @extend_schema(
+        operation_id="list_all_products",
+        description="List all products short descriptions: name, price",
+        responses={200: ProductSerializer(many=True)}
+    )
     def get(self, request):
         pagination = PageNumberPagination()
         data = request.GET
@@ -54,6 +66,14 @@ class StoreProductsView(APIView):
         serializer = ProductSerializer(page, many=True)
         return pagination.get_paginated_response(serializer.data)
 
+    @extend_schema(
+        operation_id="create_product",
+        description="Create a new product",
+        responses={
+            201: OpenApiResponse(description="Successfully created new product!"),
+            400: OpenApiResponse(description="Failed to create new product or unauthorized.")
+        }
+    )
     def post(self, request):
         user = request.user
 
@@ -85,7 +105,16 @@ class StoreProductsView(APIView):
 
 class ProductView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = ProductSerializer
 
+    @extend_schema(
+        operation_id="retrieve_product_detail",
+        description="Retrieve details of a product by ID",
+        responses={
+            200: ProductSerializer,
+            404: OpenApiResponse(description="No such product!")
+        }
+    )
     def get(self, request, id):
         try:
             product = Product.objects.get(pk=id)
@@ -96,6 +125,8 @@ class ProductView(APIView):
 
 
 class OrderViewset(viewsets.ViewSet):
+    serializer_class = OrderSerializer
+
     def get(self, request):
         try:
             user = request.user
@@ -129,7 +160,12 @@ class OrderViewset(viewsets.ViewSet):
             return Response({"message": "Successfully Save Order!"}, status=200)
         except Exception as error:
             return Response({ "error": error }, status=404)
-
+    
+    @extend_schema(
+        parameters=[OpenApiParameter(
+            name='user_id', type=OpenApiTypes.INT, location=OpenApiParameter.PATH
+        )]
+    )
     @action(detail=False, methods=["GET"], url_path="userid/(?P<user_id>[^/.]+)")
     def get_by_userid(self, request, user_id):
         req_user = request.user
@@ -143,6 +179,7 @@ class OrderViewset(viewsets.ViewSet):
             return Response({"errors": "You need to have role admin!"}, status=400)
         
 class OrderItemView(APIView):
+    serializer_class = OrderItemSerializer
 
     def get(self, request):
         req_user = request.user
@@ -189,6 +226,7 @@ class OrderItemView(APIView):
             return Response({ "error": "This item is" })
 
 class UserInfoView(APIView):
+    serializer_class = UserInfoSerializer
 
     def get(self, request):
         req_user = request.user
