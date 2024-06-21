@@ -3,11 +3,8 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import (
-    action, 
-    authentication_classes, 
-    permission_classes
-)
+from rest_framework.decorators import action
+from django.conf import settings
 from drf_spectacular.utils import (
     extend_schema, 
     OpenApiParameter,
@@ -47,7 +44,7 @@ class StoreProductsView(APIView):
 
         if is_hot_saled:
             products = Product.objects.filter(isHotSaled=True).values()
-            pagination.page_size = 5
+            pagination.page_size = settings.HOT_SALED_PAGINATION_PAGE_SIZE
         else:
             devices = data.get('devices')
             brand = data.get('brand')
@@ -60,7 +57,7 @@ class StoreProductsView(APIView):
                 products = Product.objects.all()
             if name:    
                 products = products.filter(name__icontains=name)
-            pagination.page_size = 15
+            pagination.page_size = settings.PAGINATION_PAGE_SIZE
 
         page = pagination.paginate_queryset(products, request)
         serializer = ProductSerializer(page, many=True)
@@ -239,7 +236,7 @@ class UserInfoView(APIView):
         req_user = request.user
 
         try:
-            user_info, created = UserInfo.objects.get_or_create(user=req_user)
+            user_info, _ = UserInfo.objects.get_or_create(user=req_user)
         except UserInfo.DoesNotExist:
             return Response({"error": "User info not found"}, status=404)
 

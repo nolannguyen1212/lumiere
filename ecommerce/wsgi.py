@@ -14,7 +14,7 @@ load_dotenv()
 
 from django.core.wsgi import get_wsgi_application
 
-if os.getenv("ENV", "DEVELOP") == "PRODUCTION":
+if os.getenv("ENVIRONMENT") == "PRODUCTION":
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerce.settings.production')
 else:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecommerce.settings.develop')

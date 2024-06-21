@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = False
 
 # security.W016
 CSRF_COOKIE_SECURE = True
@@ -29,9 +29,9 @@ CSRF_TRUSTED_ORIGINS = ["https://ecoinbe.chilly-male.wonderfulshed.xyz"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "NAME": os.getenv("DATABASE_NAME", "ecoin"),
+        "USER": os.getenv("DATABASE_USER", "root"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", ""),
         "HOST": os.getenv("DATABASE_HOST", "localhost"),
         "PORT": os.getenv("DATABASE_PORT", 3306),
         "OPTIONS": {

@@ -32,6 +32,7 @@ PASSWORD_HASHED_DEFAULT = "$2b$12$P67M0FhlsEZHvTkCHvMXDuIYTJF3oCV1rGHcyxU5ZtdVnZ
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+SECURE_SSL_REDIRECT=False
 
 # Application definition
 
@@ -125,6 +126,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "authen.User"
 
+# REST FRAMEWORK
+
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -147,8 +150,12 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static") ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# SECRET KEY SETTINGS
+
 SITE_URL = os.getenv("SITE_URL")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+
+# JWT SETTINGS
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=60),
@@ -183,3 +190,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+# PAGINATION SETTINGS
+PAGINATION_PAGE_SIZE = 15
+HOT_SALED_PAGINATION_PAGE_SIZE = 5
