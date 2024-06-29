@@ -4,7 +4,7 @@ from .base import *
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = ["https://ecoinbe.chilly-male.wonderfulshed.xyz"]
+CSRF_TRUSTED_ORIGINS = ["https://ecoinbe.chilly-male.wonderfulshed.xyz", "https://ecoin-nova.xyz", "https://ecoinfe.chilly-male.wonderfulshed.xyz"]
 
 # Database
 DATABASES = {
