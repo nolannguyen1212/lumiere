@@ -1,6 +1,6 @@
-# ECOIN
+# ECOINBE
 
-- This is an ecommerce website.
+- This is backend for **Ecoin** ecommerce website.
 - **Admin Site :** `Django` provide us a wonderful Admin Management Site.
 - **Payment Method :** We are using `Stripe` (Stripe Elements) for virtualing a payment.
   - Region: We currently support `US` and `VN` using Stripe Address Elements.
