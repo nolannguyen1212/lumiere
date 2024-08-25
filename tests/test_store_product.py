@@ -52,39 +52,39 @@ class StoreProductTest(APITestCase):
     def test_get_all_products_without_perm(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
         response = self.client.get("/api/products")
-        self.assertEquals(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)
 
     def test_get_all_products(self):
         response = self.client.get("/api/products")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         data = response.data
-        self.assertEquals(len(data), 1)
+        self.assertEqual(data["count"], 1)
 
     def test_get_a_product_without_perm(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
         response = self.client.get(f"/api/products/{self.product.id}")
-        self.assertEquals(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)
 
     def test_get_a_product(self):
         response = self.client.get(f"/api/products/{self.product.id}")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         data = response.data
-        self.assertEquals(len(data), 1)
+        self.assertEqual(len(data), 1)
         product = data.get("product")
-        self.assertEquals(product.get("name"), self.product_name)
+        self.assertEqual(product.get("name"), self.product_name)
 
     def test_get_undefined_product(self):
         undefined_id = -1
         response = self.client.get(f"/api/products/{-1}")
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_create_new_product_without_admin_perm(self):
         response = self.client.post("/api/products",
             data=self.payload_test_product)
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         data = response.data
         error = data.get("errors")
-        self.assertEquals(error, "You need to have role admin!")
+        self.assertEqual(error, "You need to have role admin!")
     
     def test_create_new_product_with_admin_perm(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.admin_token}')
@@ -92,4 +92,4 @@ class StoreProductTest(APITestCase):
         response = self.client.post("/api/products",
             data=self.payload_test_product)
         
-        self.assertEquals(response.status_code, 201)
+        self.assertEqual(response.status_code, 201)

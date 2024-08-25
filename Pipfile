@@ -21,6 +21,7 @@ django-admin-soft-dashboard = "*"
 mysqlclient = "2.2.3"
 gevent = "*"
 drf-spectacular = "*"
+coverage = "*"
 
 [dev-packages]
 

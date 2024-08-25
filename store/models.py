@@ -111,7 +111,7 @@ class UserInfo(models.Model):
     date_of_birth = models.CharField(max_length=50, default=None, null=True, blank=True)
     gender = models.CharField(max_length=50, choices=GenderType.get_choices())
     email = models.CharField(max_length=50)
-    phone = models.CharField(max_length=10)
+    phone = models.CharField(max_length=50)
 
     home_address = models.CharField(max_length=50, default="")
     home_number = models.CharField(max_length=50, default="")

@@ -38,22 +38,22 @@ class UserLoginTests(APITestCase):
         response = self.client.post("/users/login", 
             data=self.payload_login)
         
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_user_login_empty_email(self):
         response = self.client.post("/users/login", 
             data=self.payload_login_empty_email)
         
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_user_login_empty_pwd(self):
         response = self.client.post("/users/login", 
             data=self.payload_login_empty_password)
         
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
     
     def test_user_login_incorrect(self):
         response = self.client.post("/users/login", 
             data=self.payload_login_incorrect_info)
         
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
