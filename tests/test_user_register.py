@@ -45,7 +45,7 @@ class UserRegisterTests(APITestCase):
 
     def test_register_user(self):
         response = self.client.post("/users/signup", data=self.payload_test_register)
-        self.assertEquals(response.status_code, 201)
+        self.assertEqual(response.status_code, 201)
 
     def test_register_existed_username(self):
         # create user first time
@@ -57,11 +57,11 @@ class UserRegisterTests(APITestCase):
             data=self.payload_test_register_existed_username[1])
         
         # check status code
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
         # check error message
         error_message = response.data.get('non_field_errors')[0]
-        self.assertEquals(error_message, "User username need to be unique!")
+        self.assertEqual(error_message, "User username need to be unique!")
     
     def test_register_existed_email(self):
         # create user first time
@@ -73,8 +73,8 @@ class UserRegisterTests(APITestCase):
             data=self.payload_test_register_existed_email[1])
 
         # check status code
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
         # check error message
         error_message = response.data.get("email")[0]
-        self.assertEquals(error_message, "user with this email already exists.")
+        self.assertEqual(error_message, "user with this email already exists.")

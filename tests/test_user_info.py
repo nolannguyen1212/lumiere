@@ -34,7 +34,7 @@ class UserInfoTests(APITestCase):
             "lastname": "User",
             "gender": "Male",
             "email": self.email,
-            "phone": "test_phone_number",
+            "phone": "phone_number",
             
             "home_address": "test_home_address",
             "home_number": "test_home_number",
@@ -50,22 +50,22 @@ class UserInfoTests(APITestCase):
     def test_get_user_info_without_perms(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
         response = self.client.get("/api/info")
-        self.assertEquals(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)
 
     def test_get_user_info_with_perms(self):
         response = self.client.get("/api/info")
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_modify_user_info_without_perms(self):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ')
         response = self.client.post("/api/info",
             data=self.payload_modify_user_info)
-        self.assertEquals(response.status_code, 401)
+        self.assertEqual(response.status_code, 401)
 
     def test_modify_user_info_with_perms(self):
         response = self.client.post("/api/info",
             data=self.payload_modify_user_info)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         
         user_info = response.data
-        self.assertEquals(user_info.get("email"), self.email)
+        self.assertEqual(user_info.get("email"), self.email)

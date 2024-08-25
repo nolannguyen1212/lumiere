@@ -29,9 +29,11 @@
   > React Alert: `react-hot-toast`
   > I use `ReacJS` for **Frontend**, so before deploying, **ReactJS** was exported.
 
+- `Coverage & Django testing module` **(for testing)**: cover 81%.
+
 ## Requirements
 
-- `Python ~ 3.9`
+- `Python ~ 3.12`
 
 ## Setup virtual env (Optional)
 
@@ -96,5 +98,6 @@
 - **Run tests after updating modules**
 
   ```
-  $ python manage.py test tests -v 2
+  $ coverage run manage.py test tests
+  $ coverage report
   ```
