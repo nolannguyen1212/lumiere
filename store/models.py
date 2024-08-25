@@ -42,6 +42,7 @@ class Product(models.Model):
         indexes = [
             models.Index(fields=['name'], name='name_index_idx')
         ]
+        ordering = ['id']
 
     def __str__(self) -> str:
         return self.name
