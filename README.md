@@ -35,6 +35,19 @@
 
 - `Python ~ 3.12`
 
+#### NOVA AI Assistant
+
+- Bubble chat
+
+![](https://github.com/william1nguyen/ecoinfe/raw/master/src/assets/new_features.png)
+
+- Popup Apperance
+
+![](https://github.com/william1nguyen/ecoinfe/raw/master/src/assets/bubblechat.png)
+
+- ChatModel : Google Gemini
+- Tools : (LLM Platform)Flowise, (Vector Database) Pinecone, ...
+
 ## Setup virtual env (Optional)
 
 ### Setup `Pipenv`
