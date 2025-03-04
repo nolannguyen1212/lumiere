@@ -142,7 +142,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Ecoin",
+    "TITLE": "Xshop",
 }
 
 # Static files (CSS, JavaScript, Images)
