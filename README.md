@@ -14,8 +14,8 @@
 
 <div align="center">
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/xshop?style=social)](https://github.com/yourusername/xshop)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/xshop?style=social)](https://github.com/yourusername/xshop/fork)
+[![GitHub stars](https://img.shields.io/github/stars/william1nguyen/xshop?style=social)](https://github.com/william1nguyen/xshop)
+[![GitHub forks](https://img.shields.io/github/forks/william1nguyen/xshop?style=social)](https://github.com/william1nguyen/xshop/fork)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 </div>
