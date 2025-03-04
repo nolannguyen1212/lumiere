@@ -16,17 +16,19 @@ import { LoginProvider } from "./contexts/LoginContext";
 import { ProductView } from "./pages/store/ProductView";
 import { Footer } from "./components/Footer/Footer";
 import { WelcomePage } from "./pages/welcome/WelcomPage";
-import iconUrl from './assets/react.svg';
+import iconUrl from "./assets/react.svg";
 import { SearchProvider } from "./contexts/SearchContext";
 import { BubbleChat } from "flowise-embed-react";
 
 const App = () => {
   useEffect(() => {
-    const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement
+    const favicon = document.querySelector(
+      "link[rel~='icon']"
+    ) as HTMLLinkElement;
     if (favicon) {
       favicon.href = iconUrl;
     }
-    document.title = "ECOIN";
+    document.title = "XSHOP";
   }, []);
 
   return (
@@ -44,7 +46,10 @@ const App = () => {
             />
             <div className="app-container">
               <HideAppBar />
-              <div style={{ padding: "2rem", margin: "0 auto" }} className="content">
+              <div
+                style={{ padding: "2rem", margin: "0 auto" }}
+                className="content"
+              >
                 <Routes>
                   <Route
                     path="/login"
@@ -62,16 +67,31 @@ const App = () => {
                     path="/settings"
                     element={<LoadingRoute element={<Settings />} />}
                   />
-                  <Route path="/" element={<LoadingRoute element={<WelcomePage />} />} />
-                  <Route path="/store/devices/:devices" element={<LoadingRoute element={<Store />} />} />
-                  <Route path="/store/brand/:brand" element={<LoadingRoute element={<Store />} />} />
-                  <Route path="/store" element={<LoadingRoute element={<Store />} />} />
+                  <Route
+                    path="/"
+                    element={<LoadingRoute element={<WelcomePage />} />}
+                  />
+                  <Route
+                    path="/store/devices/:devices"
+                    element={<LoadingRoute element={<Store />} />}
+                  />
+                  <Route
+                    path="/store/brand/:brand"
+                    element={<LoadingRoute element={<Store />} />}
+                  />
+                  <Route
+                    path="/store"
+                    element={<LoadingRoute element={<Store />} />}
+                  />
                   <Route
                     path="/products/:productId"
                     element={<LoadingRoute element={<ProductView />} />}
                   />
                 </Routes>
-                <BubbleChat chatflowid={import.meta.env.VITE_FLOWISE_CHATFLOW_ID} apiHost={import.meta.env.VITE_FLOWISE_API_HOST} />
+                <BubbleChat
+                  chatflowid={import.meta.env.VITE_FLOWISE_CHATFLOW_ID}
+                  apiHost={import.meta.env.VITE_FLOWISE_API_HOST}
+                />
               </div>
               <Footer />
             </div>

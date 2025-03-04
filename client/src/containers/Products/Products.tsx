@@ -62,9 +62,13 @@ export const Products: React.FC<ProductProps> = ({ devices, brand }) => {
         let url = import.meta.env.VITE_API_ROOT;
         console.log(devices);
         if (devices) {
-          url = url + `/api/products?devices=${devices}&&page=${currentPage}&&name=${searchParams}`;
+          url =
+            url +
+            `/api/products?devices=${devices}&&page=${currentPage}&&name=${searchParams}`;
         } else if (brand) {
-          url = url + `/api/products?brand=${brand}&&page=${currentPage}&&name=${searchParams}`;
+          url =
+            url +
+            `/api/products?brand=${brand}&&page=${currentPage}&&name=${searchParams}`;
         } else {
           url = url + `/api/products?page=${currentPage}&&name=${searchParams}`;
         }
@@ -108,6 +112,10 @@ export const Products: React.FC<ProductProps> = ({ devices, brand }) => {
                 className="thumbnail"
                 src={product.imageUploadURL}
                 alt={product.name}
+                onError={(e: any) => {
+                  e.target.onerror = null;
+                  e.target.src = "./src/assets/default-item-image.png";
+                }}
               />
               <br />
               <a href={`/products/${product.id}`}>
@@ -128,17 +136,18 @@ export const Products: React.FC<ProductProps> = ({ devices, brand }) => {
           </Grid>
         ))}
       </Grid>
-      <Pagination count={pageNumber} 
+      <Pagination
+        count={pageNumber}
         page={currentPage}
-        color="primary" 
+        color="primary"
         size="large"
         style={{
-          display: "flex", 
-          alignItems: "center", 
+          display: "flex",
+          alignItems: "center",
           justifyContent: "center",
           padding: "10px",
-          marginTop: "20px"
-        }} 
+          marginTop: "20px",
+        }}
         onChange={handlePageChange}
       />
     </>
