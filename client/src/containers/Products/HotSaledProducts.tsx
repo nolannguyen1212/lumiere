@@ -52,7 +52,9 @@ export const HotSaledProducts = () => {
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const url = import.meta.env.VITE_API_ROOT + `/api/products?is_hot_saled=true&&page=${currentPage}`;
+        const url =
+          import.meta.env.VITE_API_ROOT +
+          `/api/products?is_hot_saled=true&&page=${currentPage}`;
         const response = await axios({
           method: "GET",
           url: url,
@@ -93,6 +95,10 @@ export const HotSaledProducts = () => {
                 className="thumbnail"
                 src={product.imageUploadURL}
                 alt={product.name}
+                onError={(e: any) => {
+                  e.target.onerror = null;
+                  e.target.src = "./src/assets/default-item-image.png";
+                }}
               />
               <br />
               <a href={`/products/${product.id}`}>
@@ -113,17 +119,18 @@ export const HotSaledProducts = () => {
           </Grid>
         ))}
       </Grid>
-      <Pagination count={pageNumber} 
+      <Pagination
+        count={pageNumber}
         page={currentPage}
-        color="primary" 
+        color="primary"
         size="large"
         style={{
-          display: "flex", 
-          alignItems: "center", 
+          display: "flex",
+          alignItems: "center",
           justifyContent: "center",
           padding: "10px",
-          marginTop: "20px"
-        }} 
+          marginTop: "20px",
+        }}
         onChange={handlePageChange}
       />
     </>

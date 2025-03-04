@@ -67,7 +67,7 @@ export const ProductView = () => {
         method: "GET",
         url: url,
       });
-      
+
       const product: any = response["data"]["product"];
 
       const descriptionList = await parser(product["description"]);
@@ -95,6 +95,10 @@ export const ProductView = () => {
           className="product-image"
           src={imageUrl}
           alt={`product-${id}-${name}`}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "../src/assets/default-item-image.png";
+          }}
         />
       </div>
       <div className="product-info">
@@ -114,9 +118,15 @@ export const ProductView = () => {
             <></>
           )}
           <hr />
-          <p><b>Brand:</b> <span>{brand}</span></p>
-          <p><b>Categories:</b> <span>{categories}</span></p>
-          <p><b>Models:</b> <span>{model}</span></p>
+          <p>
+            <b>Brand:</b> <span>{brand}</span>
+          </p>
+          <p>
+            <b>Categories:</b> <span>{categories}</span>
+          </p>
+          <p>
+            <b>Models:</b> <span>{model}</span>
+          </p>
           {instock ? (
             <p style={{ color: "green" }}>In Stock</p>
           ) : (
