@@ -10,8 +10,25 @@ jobs:
       - name: Echo Header
         run: echo "Running Tests"
 
-  build:
+  run_tests:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: xshop
+          MYSQL_USER: nova
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --host 127.0.0.1 --user root --password=password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +48,34 @@ jobs:
           pipenv install --dev
 
       - name: Setup Variables Env
-        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+        run: |
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+          echo "DATABASE_ENGINE=django.db.backends.mysql" >> .env
+          echo "DATABASE_NAME=xshop" >> .env
+          echo "DATABASE_USER=nova" >> .env
+          echo "DATABASE_PASSWORD=password" >> .env
+          echo "DATABASE_HOST=127.0.0.1" >> .env
+          echo "DATABASE_PORT=3306" >> .env
+
+      - name: Wait for MySQL
+        run: |
+          timeout=60
+          counter=0
+          echo "Waiting for MySQL..."
+          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u nova --password=password --silent; do
+            if [ $counter -gt $timeout ]; then
+              echo "MySQL connection timed out!"
+              exit 1
+            fi
+            echo "MySQL not ready yet. Waiting..."
+            sleep 3
+            counter=$((counter+3))
+          done
+          echo "MySQL is up and running!"
+
+      - name: Grant Database Privileges
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -ppassword -e "GRANT ALL PRIVILEGES ON *.* TO 'nova'@'%'; FLUSH PRIVILEGES;"
 
       - name: Run migrations
         run: pipenv run python manage.py migrate
