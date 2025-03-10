@@ -1,13 +1,87 @@
-name: Deploy backend
+name: Workflow Coordinator
 
 on:
   push:
     branches: [master]
-    paths-ignore:
-      - "client/**"
 
 jobs:
-  build:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      client_changed: ${{ steps.filter.outputs.client_changed }}
+      backend_changed: ${{ steps.filter.outputs.backend_changed }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: filter
+        run: |
+          # Lấy danh sách các file đã thay đổi
+          git diff --name-only ${{ github.event.before }} ${{ github.event.after }} > changed_files.txt
+
+          # Kiểm tra xem có thay đổi trong thư mục client hoặc .github hay không
+          if grep -q "^client/" changed_files.txt || grep -q "^.github/" changed_files.txt; then
+            echo "client_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "client_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Kiểm tra xem có thay đổi trong các thư mục khác (không phải client) hay không
+          if cat changed_files.txt | grep -v "^client/" | grep -v "^$" > /dev/null; then
+            echo "backend_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "backend_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+  deploy-client:
+    needs: check-changes
+    if: needs.check-changes.outputs.client_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Preset Image Name
+        run: echo "FE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          file: ./client/Dockerfile
+          push: true
+          tags: ${{ env.FE_IMAGE_URL }}
+          build-args: |
+            VITE_API_ROOT=${{ vars.VITE_API_ROOT }}
+            VITE_STRIPE_PK=${{ vars.VITE_STRIPE_PK }}
+            VITE_FLOWISE_CHATFLOW_ID=${{ vars.VITE_FLOWISE_CHATFLOW_ID }}
+            VITE_FLOWISE_API_HOST=${{ vars.VITE_FLOWISE_API_HOST }}
+
+      - name: Deploy Image to CapRrover
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: "${{ secrets.CAPROVER_SERVER }}"
+          app: "${{ secrets.FE_APP_NAME }}"
+          token: "${{ secrets.FE_APP_TOKEN }}"
+          image: ${{ env.FE_IMAGE_URL }}
+
+  deploy-backend:
+    needs: [check-changes, deploy-client]
+    if: |
+      needs.check-changes.outputs.backend_changed == 'true' && 
+      (needs.deploy-client.result == 'success' || needs.deploy-client.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -33,13 +107,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ env.BE_IMAGE_URL }}
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Preset Image Name
-        run: echo "BE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Deploy Image to CapRrover
         uses: caprover/deploy-from-github@v1.1.2
