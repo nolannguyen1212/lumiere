@@ -4,13 +4,12 @@ from .base import *
 ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = ["https://ecoinbe.chilly-male.wonderfulshed.xyz", "https://ecoin-nova.xyz", "https://ecoinfe.chilly-male.wonderfulshed.xyz"]
 
 # Database
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DATABASE_NAME", "ecoin"),
+        "NAME": os.getenv("DATABASE_NAME", "xshop"),
         "USER": os.getenv("DATABASE_USER", "root"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD", "password"),
         "HOST": os.getenv("DATABASE_HOST", "localhost"),

@@ -1,116 +1,107 @@
-# ECOINBE
+<h2 align="center">━━━━━━ ❖ ━━━━━━</h2>
 
-- This is backend for **Ecoin** ecommerce website.
-- **Admin Site :** `Django` provide us a wonderful Admin Management Site.
-- **Payment Method :** We are using `Stripe` (Stripe Elements) for virtualing a payment.
-  - Region: We currently support `US` and `VN` using Stripe Address Elements.
-  - Default Development Stripe Card:
-    - `Card number`: 4242 4242 4242 4242
-    - `Expiration`: 04/44
-    - `CVC`: 444
+<div align="center" style="margin: 20px 0;">
 
-### How to update/view Product/Order
+![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
+![](https://img.shields.io/badge/django%20rest-ff1709?style=for-the-badge&logo=django&logoColor=white)
+![](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+![](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=Stripe&logoColor=white)
 
-- Open Admin Site
+</div>
 
-  ```
-  python manage.py runserver
-  ```
+<h1 align="center">🛒 XSHOP</h1>
+<h3 align="center">Modern E-Commerce Backend with Django & Stripe</h3>
 
-- Access `BASE_URL/admin`.
+<div align="center">
 
-## Architecture & Relate Packages
+[![GitHub stars](https://img.shields.io/github/stars/william1nguyen/xshop?style=social)](https://github.com/william1nguyen/xshop)
+[![GitHub forks](https://img.shields.io/github/forks/william1nguyen/xshop?style=social)](https://github.com/william1nguyen/xshop/fork)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-- `Django Rest Framework`
-- `ReactJs`
-- `Bcrypt`
-- `Stripe` **(for payment)**
-  > [!WARNING]
-  > React Alert: `react-hot-toast`
-  > I use `ReacJS` for **Frontend**, so before deploying, **ReactJS** was exported.
+</div>
 
-- `Coverage & Django testing module` **(for testing)**: cover 81%.
+---
 
-## Requirements
+## ✨ Features
 
-- `Python ~ 3.12`
+- 🔐 **Authentication**: Secure user registration/login with Bcrypt hashing
+- 🛍️ **Product Management**: Full CRUD operations via Django Admin
+- 💳 **Stripe Integration**: Payment processing with Stripe Elements
+- 🌍 **Multi-Region Support**: US & Vietnam addresses
+- 📊 **Admin Dashboard**: Django Admin interface
+- ✅ **Test Coverage**: 81% test coverage
 
-#### NOVA AI Assistant
+---
 
-- Bubble chat
+## 🏗️ Tech Stack
 
-![](https://github.com/william1nguyen/ecoinfe/raw/master/src/assets/new_features.png)
+| Component           | Technology/Package    |
+| ------------------- | --------------------- |
+| **Framework**       | Django REST Framework |
+| **Database**        | MySQL                 |
+| **Payment Gateway** | Stripe API            |
+| **Frontend**        | React.js              |
+| **Auth**            | Bcrypt                |
+| **Testing**         | Coverage.py           |
 
-- Popup Apperance
+---
 
-![](https://github.com/william1nguyen/ecoinfe/raw/master/src/assets/bubblechat.png)
+## 🚀 Quick Start
 
-- ChatModel : Google Gemini
-- Tools : (LLM Platform)Flowise, (Vector Database) Pinecone, ...
+### 📋 Prerequisites
 
-## Setup virtual env (Optional)
+- Python 3.10+
+- MySQL Server 8.0+
+- Stripe Account
 
-### Setup `Pipenv`
+### ⚙️ Setup
 
-- See how to install [asdf](https://asdf-vm.com/guide/getting-started.html)
-- Setup `pipenv`:
+```bash
+$ git clone https://github.com/william1nguyen/xshop.git
 
-  ```
-  $ pipenv shell
-  ```
+$ cd xshop
+$ pipenv install && pipenv shell
+$ cp .env.example .env
 
-- Choose suitable version by modifying python version in Pipfile and run
+# Update .env values
+$ python manage.py migrate
+$ python manage.py runserver
+```
 
-  ```
-  $ pipenv install
-  ```
+### 💳 Stripe Testing
 
-  > [!WARNING] > `pipenv` will create `Pipfile` and `Pipfile.lock` file in order to determine `python version` and packages used.
+```yaml
+Card Number: 4242 4242 4242 4242
+Expiry: 04/44
+CVC: 444
+```
 
-## Optional Setup Database
+### 🧪 Testing
 
-- In this project I use `db.sqlite3` thanks to it's easiness.
-- You can use another like `MySQL, PostgresSQL, ...` by setting in `Settings.py`
+```bash
+$ coverage run manage.py test tests
+$ coverage report -m
+```
 
-  ```
-  DATABASES = {
-      "default": {
-          "ENGINE": "django.db.backends.sqlite3",
-          "NAME": BASE_DIR / "db.sqlite3",
-      }
-  }
-  ```
+### 📂 Project Structure
 
-  $\rightarrow$ Change `ENGINE` to other databases that are supported.
+```bash
+xshop/
+├── authen/
+├── client/
+├── ecommerce/
+├── payment/
+├── static/
+├── store/
+├── tests/
+├── Dockerfile
+├── Pipfile
+├── Pipfile.lock
+└── manage.py
+```
 
-## How to run
+### 📜 License
 
-### Local setup
+MIT License • See LICENSE for details
 
-- **Install packages**
-  ```
-  $ pipenv shell
-  $ pipenv install
-  ```
-- **Configure Environment**
-  Create a .env file from the provided .env.example and update the values accordingly.
-  ```
-  $ cp .env.example .env
-  $ export $(grep -v '^#' .env | xargs)
-  ```
-- **Initialize models database with Django**
-  ```
-  $ python manage.py migrate
-  ```
-- **Run the Application**
-
-  ```
-  $ python manage.py runserver
-  ```
-
-- **Run tests after updating modules**
-
-  ```
-  $ coverage run manage.py test tests
-  $ coverage report
-  ```
+<div align="center"> <p>Made with ❤️ by Nova</p> <a href="https://github.com/william1nguyen"> <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"> </a> </div> ```

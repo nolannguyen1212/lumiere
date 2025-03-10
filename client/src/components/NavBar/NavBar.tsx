@@ -9,7 +9,7 @@ import {
   InputBase,
   Badge,
   MenuItem,
-  Menu
+  Menu,
 } from "@mui/material";
 import {
   Settings,
@@ -19,7 +19,7 @@ import {
   AccountCircle,
   Search as SearchIcon,
   Store,
-  Person
+  Person,
 } from "@mui/icons-material";
 import { useCookies } from "react-cookie";
 import { OrderContext } from "../../contexts/OrderContext";
@@ -132,18 +132,20 @@ export const NavBar = () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          gap: "10px"
+          gap: "10px",
         }}
       >
         <Settings />
         Setting
       </MenuItem>
-      <MenuItem onClick={handleLogout}
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: "10px"
-      }}>
+      <MenuItem
+        onClick={handleLogout}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "10px",
+        }}
+      >
         <Logout />
         Log out
       </MenuItem>
@@ -186,7 +188,7 @@ export const NavBar = () => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          gap: "10px"
+          gap: "10px",
         }}
       >
         <Person />
@@ -197,12 +199,12 @@ export const NavBar = () => {
 
   const handleInputChanged = (event: any) => {
     setSearchParams(event.target.value);
-  }
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar style={{display: "flex", justifyContent: "space-between"}}>
+        <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
           <SideBar />
           <Typography
             variant="h6"
@@ -217,7 +219,7 @@ export const NavBar = () => {
               onClick={() => navigate("/")}
             >
               <CatchingPokemon />
-              ECOIN
+              XSHOP
             </IconButton>
           </Typography>
           <Search>
@@ -231,13 +233,13 @@ export const NavBar = () => {
             />
           </Search>
           <IconButton
-              size="medium"
-              color="inherit"
-              aria-label="Title"
-              onClick={() => navigate("/store")}
-            >
-              <Store />
-            </IconButton>
+            size="medium"
+            color="inherit"
+            aria-label="Title"
+            onClick={() => navigate("/store")}
+          >
+            <Store />
+          </IconButton>
           <Box sx={{ flexGrow: 1 }} />
           {isLoggedIn
             ? renderIconWithUserLoggedIn

@@ -3,7 +3,7 @@ name: Build and Deploy Docker Image
 on:
   push:
     branches: [master]
-    paths-ignore:
+    paths:
       - "client/**"
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
+          file: ./client/Dockerfile
           push: true
           tags: ${{ env.IMAGE_URL }}
 
@@ -45,6 +45,6 @@ jobs:
         uses: caprover/deploy-from-github@v1.1.2
         with:
           server: "${{ secrets.CAPROVER_SERVER }}"
-          app: "${{ secrets.BE_APP_NAME }}"
-          token: "${{ secrets.BE_APP_TOKEN }}"
+          app: "${{ secrets.FE_APP_NAME }}"
+          token: "${{ secrets.FE_APP_TOKEN }}"
           image: ${{ env.IMAGE_URL }}
