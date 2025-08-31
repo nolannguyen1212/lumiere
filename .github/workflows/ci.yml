@@ -5,39 +5,81 @@ on:
     branches: [master]
 
 jobs:
-  check-changes:
+  run_tests:
     runs-on: ubuntu-latest
-    outputs:
-      client_changed: ${{ steps.filter.outputs.client_changed }}
-      backend_changed: ${{ steps.filter.outputs.backend_changed }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: xshop
+          MYSQL_USER: nova
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --host 127.0.0.1 --user root --password=password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          fetch-depth: 0
+          python-version: "3.12"
 
-      - name: Check for changes
-        id: filter
+      - name: Setup Virtualenv
         run: |
-          # Lấy danh sách các file đã thay đổi
-          git diff --name-only ${{ github.event.before }} ${{ github.event.after }} > changed_files.txt
+          python -m pip install --upgrade pip
+          pip install pipenv
 
-          # Kiểm tra xem có thay đổi trong thư mục client hoặc .github hay không
-          if grep -q "^client/" changed_files.txt || grep -q "^.github/" changed_files.txt; then
-            echo "client_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "client_changed=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Install dependencies
+        run: |
+          pipenv install --dev
 
-          # Kiểm tra xem có thay đổi trong các thư mục khác (không phải client) hay không
-          if cat changed_files.txt | grep -v "^client/" | grep -v "^$" > /dev/null; then
-            echo "backend_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "backend_changed=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Setup Variables Env
+        run: |
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+          echo "DATABASE_ENGINE=django.db.backends.mysql" >> .env
+          echo "DATABASE_NAME=xshop" >> .env
+          echo "DATABASE_USER=nova" >> .env
+          echo "DATABASE_PASSWORD=password" >> .env
+          echo "DATABASE_HOST=127.0.0.1" >> .env
+          echo "DATABASE_PORT=3306" >> .env
+
+      - name: Wait for MySQL
+        run: |
+          timeout=60
+          counter=0
+          echo "Waiting for MySQL..."
+          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u nova --password=password --silent; do
+            if [ $counter -gt $timeout ]; then
+              echo "MySQL connection timed out!"
+              exit 1
+            fi
+            echo "MySQL not ready yet. Waiting..."
+            sleep 3
+            counter=$((counter+3))
+          done
+          echo "MySQL is up and running!"
+
+      - name: Grant Database Privileges
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -ppassword -e "GRANT ALL PRIVILEGES ON *.* TO 'nova'@'%'; FLUSH PRIVILEGES;"
+
+      - name: Run migrations
+        run: pipenv run python manage.py migrate
+
+      - name: Run tests
+        run: pipenv run python manage.py test tests
 
   deploy-client:
-    needs: check-changes
-    if: needs.check-changes.outputs.client_changed == 'true'
+    needs: [run_tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -78,10 +120,7 @@ jobs:
           image: ${{ env.FE_IMAGE_URL }}
 
   deploy-backend:
-    needs: [check-changes]
-    if: |
-      needs.check-changes.outputs.backend_changed == 'true' && 
-      (needs.deploy-client.result == 'success' || needs.deploy-client.result == 'skipped')
+    needs: [run_tests]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
