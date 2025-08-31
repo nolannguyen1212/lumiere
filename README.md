@@ -60,6 +60,8 @@
 $ git clone https://github.com/william1nguyen/xshop.git
 
 $ cd xshop
+$ brew install mysql-client pkg-config
+$ export PKG_CONFIG_PATH="$(brew --prefix)/opt/mysql-client/lib/pkgconfig"
 $ pipenv install && pipenv shell
 $ cp .env.example .env
 
