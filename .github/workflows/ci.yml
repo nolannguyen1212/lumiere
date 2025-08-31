@@ -36,8 +36,6 @@ jobs:
           fi
 
   deploy-client:
-    needs: check-changes
-    if: needs.check-changes.outputs.client_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -78,10 +76,6 @@ jobs:
           image: ${{ env.FE_IMAGE_URL }}
 
   deploy-backend:
-    needs: [check-changes]
-    if: |
-      needs.check-changes.outputs.backend_changed == 'true' && 
-      (needs.deploy-client.result == 'success' || needs.deploy-client.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
