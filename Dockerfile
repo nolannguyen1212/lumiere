@@ -12,20 +12,21 @@ RUN apk update && apk --no-cache add \
     g++ \
     libc-dev \
     libffi-dev \
-    mariadb-dev \
     libxslt-dev \
     linux-headers
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY Pipfile Pipfile.lock docker-entrypoint.sh ./
-RUN pip3 install --upgrade pip
-RUN pip3 install pipenv
-RUN pipenv install --system
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+COPY pyproject.toml uv.lock docker-entrypoint.sh ./
+RUN uv sync --frozen --no-dev
 
 COPY . /app/
 RUN chmod u+x docker-entrypoint.sh
+
+ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8080
 ENTRYPOINT ["sh", "docker-entrypoint.sh"]

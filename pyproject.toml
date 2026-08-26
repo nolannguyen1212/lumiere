@@ -1,0 +1,28 @@
+[project]
+name = "lumiere"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "asgiref==3.7.2",
+    "bcrypt>=4.1",
+    "django>=4.2,<5.0",
+    "django-cors-headers>=4.2.0",
+    "djangorestframework>=3.15",
+    "djangorestframework-simplejwt>=5.5",
+    "django-filter>=24.3",
+    "drf-spectacular>=0.28",
+    "gevent>=24.11",
+    "gunicorn>=23.0",
+    "pillow>=10.0",
+    "pyjwt>=2.8",
+    "python-dotenv>=1.0",
+    "sqlparse==0.4.4",
+    "stripe>=11.0",
+    "channels>=4.2.2",
+    "daphne>=4.2.3",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.0",
+]
