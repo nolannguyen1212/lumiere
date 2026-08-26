@@ -4,4 +4,7 @@ set -e
 
 python manage.py makemigrations
 python manage.py migrate
-gunicorn lumiere.wsgi:application -b 0.0.0.0:8080 -w 3 -k gevent --name lumiere --timeout 200 --keep-alive 30
+python manage.py seed_menu
+python manage.py ensure_superuser
+python manage.py collectstatic --noinput
+daphne -b 0.0.0.0 -p 8080 lumiere.asgi:application
