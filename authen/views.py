@@ -1,14 +1,8 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import (
-    UserLoginSerializer, 
-    UserRegistrationSerializer, 
-    UserSerializer
-)
-from .utils.jwt_utils import get_token
-from .models import User
+from rest_framework.views import APIView
 
-# Create your views here.
+from .serializers import UserLoginSerializer, UserRegistrationSerializer, UserSerializer
+from .utils.jwt_utils import get_token
 
 
 class Login(APIView):
@@ -17,18 +11,10 @@ class Login(APIView):
     serializer_class = UserLoginSerializer
 
     def post(self, request):
-        data = request.data
-        serializer = UserLoginSerializer(data=data)
-
-        if serializer.is_valid(raise_exception=True):
-            validated_data = serializer.validated_data
-            email = validated_data.get("email")
-            user = User.objects.get(email=email)
-            response = get_token(user)
-            return Response(response, status=200)
-        else:
-            errors = serializer.errors
-            return Response({"errors": errors}, status=400)
+        serializer = UserLoginSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        return Response(get_token(user), status=200)
 
 
 class Register(APIView):
@@ -37,26 +23,15 @@ class Register(APIView):
     serializer_class = UserRegistrationSerializer
 
     def post(self, request):
-        data = request.data
-        serializer = UserRegistrationSerializer(data=data)
+        serializer = UserRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Successfully registered user!"}, status=201)
 
-        if serializer.is_valid(raise_exception=True):
-            validated_data = serializer.validated_data
-            serializer.create(validated_data)
-            return Response({"message": "Successfully registered user!"}, status=201)
-        else:
-            errors = serializer.errors
-            return Response({"errors": errors}, status=400)
 
 class UserView(APIView):
     serializer_class = UserSerializer
 
     def get(self, request):
-        user = request.user
-        try:
-            user_info = User.objects.get(username=user)
-            serializer = UserSerializer(user_info)
-            return Response({"user": serializer.data}, status=200)
-        except:
-            return Response({"errors": "Missing authentication!"}, status=404)
-        
+        serializer = UserSerializer(request.user)
+        return Response({"user": serializer.data}, status=200)

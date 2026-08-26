@@ -1,65 +1,84 @@
+from django.contrib.auth import authenticate
 from rest_framework import serializers
+
+from menu.models import GenderType, UserInfo
+
 from .models import User
-import bcrypt
 
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-    def validate(self, validated_data):
-        email = validated_data.get("email")
-        password = validated_data.get("password")
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
 
-        if not email and not password:
+        if not email or not password:
             raise serializers.ValidationError("Email and password can't be empty!")
 
-        if not User.objects.filter(email=email).exists():
-            raise serializers.ValidationError("User doesn't exist!")
+        user = authenticate(request=self.context.get("request"), email=email, password=password)
+        if user is None:
+            raise serializers.ValidationError("Email or password is not correct!")
 
-        user = User.objects.get(email=email)
-        if not bcrypt.checkpw(
-            password=password.encode("utf-8"),
-            hashed_password=user.hashed_password.encode("utf-8"),
-        ):  # password need to store in pybytes
-            raise serializers.ValidationError("Password is not correct!")
-
-        return validated_data
+        attrs["user"] = user
+        return attrs
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    password_confirm = serializers.CharField(write_only=True)
+    firstname = serializers.CharField(max_length=50)
+    lastname = serializers.CharField(max_length=50)
+    date_of_birth = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    gender = serializers.ChoiceField(choices=GenderType.choices)
+    phone = serializers.CharField(max_length=50)
 
     class Meta:
         model = User
-        fields = ["username", "email", "role", "password"]
+        fields = [
+            "username",
+            "email",
+            "password",
+            "password_confirm",
+            "firstname",
+            "lastname",
+            "date_of_birth",
+            "gender",
+            "phone",
+        ]
 
-    def validate(self, validated_data):
-        username = validated_data.get("username")
-        email = validated_data.get("email")
-
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError("User email need to be unique!")
-
-        if User.objects.filter(username=username).exists():
+    def validate(self, attrs):
+        if User.objects.filter(username=attrs["username"]).exists():
             raise serializers.ValidationError("User username need to be unique!")
-
-        return validated_data
+        if attrs["password"] != attrs["password_confirm"]:
+            raise serializers.ValidationError("Passwords don't match!")
+        return attrs
 
     def create(self, validated_data):
-        password = validated_data["password"]
-        del validated_data["password"]
+        validated_data.pop("password_confirm")
+        password = validated_data.pop("password")
+        firstname = validated_data.pop("firstname")
+        lastname = validated_data.pop("lastname")
+        date_of_birth = validated_data.pop("date_of_birth", "")
+        gender = validated_data.pop("gender")
+        phone = validated_data.pop("phone")
 
-        bytes = password.encode("utf-8") # encode password to pybytes
-        validated_data["hashed_password"] = bcrypt.hashpw(
-            bytes, bcrypt.gensalt()
-        ).decode("utf-8")
-
-        user = User.objects.create(**validated_data)
+        user = User.objects.create_user(password=password, **validated_data)
+        UserInfo.objects.create(
+            user=user,
+            firstname=firstname,
+            lastname=lastname,
+            date_of_birth=date_of_birth,
+            gender=gender,
+            email=validated_data["email"],
+            phone=phone,
+        )
         return user
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ["id", "username", "email", "role", "is_active", "date_joined"]
+        read_only_fields = fields
