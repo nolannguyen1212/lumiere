@@ -10,3 +10,9 @@ README.md
 __pycache__
 *.pyc
 .git
+db.sqlite3
+staticfiles
+
+# frontend (rebuilt in the frontend-builder stage)
+client/node_modules
+client/build
