@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
-class PaymentSuccessedSerializer(serializers.Serializer):
-    clientSecret = serializers.CharField()
+
+class CreatePaymentIntentSerializer(serializers.Serializer):
+    order_id = serializers.UUIDField()
+
+
+class PaymentSucceededSerializer(serializers.Serializer):
+    client_secret = serializers.CharField()
+
 
 class PaymentFailedSerializer(serializers.Serializer):
     error = serializers.CharField()
