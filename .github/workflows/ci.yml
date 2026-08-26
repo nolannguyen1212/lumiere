@@ -1,43 +1,34 @@
-name: Deploy
-
+name: execute tests
+run-name: tests execution
 on:
-  push:
+  pull_request:
     branches: [master]
-
 jobs:
-  deploy:
+  run_tests:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to Container Registry
-        uses: docker/login-action@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_TOKEN }}
+          python-version: "3.14"
 
-      - name: Preset Image Name
-        run: echo "IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/lumiere:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ env.IMAGE_URL }}
-          build-args: |
-            VITE_STRIPE_PK=${{ vars.VITE_STRIPE_PK }}
+          enable-cache: true
 
-      - name: Deploy Image to CapRover
-        uses: caprover/deploy-from-github@v1.1.2
-        with:
-          server: "${{ secrets.CAPROVER_SERVER }}"
-          app: "${{ secrets.BE_APP_NAME }}"
-          token: "${{ secrets.BE_APP_TOKEN }}"
-          image: ${{ env.IMAGE_URL }}
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Setup Variables Env
+        run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
+
+      - name: Run migrations
+        run: uv run python manage.py migrate
+
+      - name: Run tests
+        run: uv run python manage.py test tests

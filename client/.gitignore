@@ -24,3 +24,5 @@ build
 *.sln
 *.sw?
 .env
+.env.local
+.env.production
