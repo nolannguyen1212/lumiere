@@ -23,7 +23,7 @@ graph TD
     APPS[authen · menu · payment · notifications]
   end
 
-  API -->|"/users /api /payment"| REST
+  API -->|"/api/*"| REST
   WS -->|"/ws/notifications?token="| CHAN
   REST --> APPS
   APPS -->|"notify_user to group_send"| CHAN
@@ -111,7 +111,7 @@ sequenceDiagram
   participant I as axios interceptor
   participant A as authen
 
-  C->>I: POST /users/login
+  C->>I: POST /api/users/login
   I->>A: forward
   A-->>C: access_token + refresh_token
 
@@ -120,7 +120,7 @@ sequenceDiagram
   C->>I: any request
   I->>A: forward with access_token
   A-->>I: 401
-  I->>A: POST /users/token/refresh
+  I->>A: POST /api/users/token/refresh
   A-->>I: new access_token
   I->>A: retry original request
   A-->>I: 200
