@@ -56,25 +56,25 @@ class UserRegisterTests(APITestCase):
         ]
 
     def test_register_user(self):
-        response = self.client.post("/users/signup", data=self.payload_test_register)
+        response = self.client.post("/api/users/signup", data=self.payload_test_register)
         self.assertEqual(response.status_code, 201)
 
     def test_register_mismatched_passwords(self):
         payload = {**self.payload_test_register, "password_confirm": "different"}
-        response = self.client.post("/users/signup", data=payload)
+        response = self.client.post("/api/users/signup", data=payload)
         self.assertEqual(response.status_code, 400)
 
     def test_register_existed_username(self):
-        self.client.post("/users/signup", data=self.payload_test_register_existed_username[0])
-        response = self.client.post("/users/signup", data=self.payload_test_register_existed_username[1])
+        self.client.post("/api/users/signup", data=self.payload_test_register_existed_username[0])
+        response = self.client.post("/api/users/signup", data=self.payload_test_register_existed_username[1])
 
         self.assertEqual(response.status_code, 400)
         error_message = response.data.get("non_field_errors")[0]
         self.assertEqual(error_message, "User username need to be unique!")
 
     def test_register_existed_email(self):
-        self.client.post("/users/signup", data=self.payload_test_register_existed_email[0])
-        response = self.client.post("/users/signup", data=self.payload_test_register_existed_email[1])
+        self.client.post("/api/users/signup", data=self.payload_test_register_existed_email[0])
+        response = self.client.post("/api/users/signup", data=self.payload_test_register_existed_email[1])
 
         self.assertEqual(response.status_code, 400)
         error_message = response.data.get("email")[0]

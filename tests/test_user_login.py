@@ -16,17 +16,17 @@ class UserLoginTests(AuthenticatedAPITestCase):
         }
 
     def test_user_login(self):
-        response = self.client.post("/users/login", data=self.payload_login)
+        response = self.client.post("/api/users/login", data=self.payload_login)
         self.assertEqual(response.status_code, 200)
 
     def test_user_login_empty_email(self):
-        response = self.client.post("/users/login", data=self.payload_login_empty_email)
+        response = self.client.post("/api/users/login", data=self.payload_login_empty_email)
         self.assertEqual(response.status_code, 400)
 
     def test_user_login_empty_pwd(self):
-        response = self.client.post("/users/login", data=self.payload_login_empty_password)
+        response = self.client.post("/api/users/login", data=self.payload_login_empty_password)
         self.assertEqual(response.status_code, 400)
 
     def test_user_login_incorrect(self):
-        response = self.client.post("/users/login", data=self.payload_login_incorrect_info)
+        response = self.client.post("/api/users/login", data=self.payload_login_incorrect_info)
         self.assertEqual(response.status_code, 400)

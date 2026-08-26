@@ -13,7 +13,7 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-const REFRESH_URL = "/users/token/refresh";
+const REFRESH_URL = "/api/users/token/refresh";
 
 let refreshPromise: Promise<string> | null = null;
 

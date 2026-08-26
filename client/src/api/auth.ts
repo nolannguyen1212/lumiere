@@ -7,10 +7,10 @@ export interface LoginResponse {
 }
 
 export const login = (payload: UserLoginPayload) =>
-  http.post<LoginResponse>("/users/login", payload).then((response) => response.data);
+  http.post<LoginResponse>("/api/users/login", payload).then((response) => response.data);
 
 export const signup = (payload: UserSignupPayload) =>
-  http.post<{ message: string }>("/users/signup", payload).then((response) => response.data);
+  http.post<{ message: string }>("/api/users/signup", payload).then((response) => response.data);
 
 export const fetchCurrentUser = () =>
-  http.get<{ user: User }>("/users/me").then((response) => response.data.user);
+  http.get<{ user: User }>("/api/users/me").then((response) => response.data.user);
