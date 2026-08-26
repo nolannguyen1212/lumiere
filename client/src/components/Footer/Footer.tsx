@@ -1,77 +1,81 @@
-import "./Footer.css";
-import { CFooter, CLink } from "@coreui/react";
-import { Grid } from "@mui/material";
-import ContactInfo from "./ContactInfo";
+import { Box, Container, Divider, Grid, Link as MuiLink, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { categoryPath, MENU_CATEGORIES } from "../../constants/menuCategories";
+import { ContactInfo } from "./ContactInfo";
+
+const guestServices = ["Reservations", "Private Events", "Gift Cards", "Contact Us"];
+const aboutUs = ["Our Story", "The Chef", "Careers", "Press"];
 
 export const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const renderLinkList = (items: string[], to: string) => (
+    <Stack spacing={1}>
+      {items.map((item) => (
+        <MuiLink
+          key={item}
+          component={Link}
+          to={to}
+          variant="body2"
+          underline="hover"
+          sx={{ color: "grey.400", "&:hover": { color: "secondary.light" } }}
+        >
+          {item}
+        </MuiLink>
+      ))}
+    </Stack>
+  );
+
   return (
-    <CFooter
-      style={{
-        marginTop: "50px",
-        padding: "10px 50px",
-        width: "100%",
-        background: "#1876d1",
-      }}
-      className="footer"
-    >
-      <Grid container rowSpacing={1} columnSpacing={2}>
-        <Grid item xs={3}>
-          <div className="footer-block">
-            <h2>Customer Care</h2>
-            <div>
-              <p>Contact Us</p>
-              <p>FAQs</p>
-              <p>Terms of Service</p>
-              <p>Privacy Policy</p>
-            </div>
-          </div>
-        </Grid>
-        <Grid item xs={3}>
-          <div className="footer-block">
-            <h2>Categories</h2>
-            <div>
-              <p>Laptop</p>
-              <p>Phone</p>
-              <p>Tablet</p>
-              <p>Headphone</p>
-              <p>Smart Watch</p>
-            </div>
-          </div>
-        </Grid>
-        <Grid item xs={3}>
-          <div className="footer-block">
-            <h2>About Us</h2>
-            <div>
-              <p>Company</p>
-              <p>Leadership</p>
-              <p>Careers</p>
-              <p>Customers</p>
-            </div>
-          </div>
-        </Grid>
-        <Grid item xs={3}>
-          <div className="footer-block">
-            <h2>Contact</h2>
+    <Box component="footer" sx={{ mt: 8, bgcolor: "primary.main", color: "primary.contrastText" }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, sm: 6 } }}>
+        <Grid container spacing={4}>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
+              Guest Services
+            </Typography>
+            {renderLinkList(guestServices, "/contact")}
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
+              Menu
+            </Typography>
+            <Stack spacing={1}>
+              {MENU_CATEGORIES.map((category) => (
+                <MuiLink
+                  key={category}
+                  component={Link}
+                  to={categoryPath(category)}
+                  variant="body2"
+                  underline="hover"
+                  sx={{ color: "grey.400", "&:hover": { color: "secondary.light" } }}
+                >
+                  {category}
+                </MuiLink>
+              ))}
+            </Stack>
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
+              About Us
+            </Typography>
+            {renderLinkList(aboutUs, "/about")}
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>
+              Contact
+            </Typography>
             <ContactInfo />
-          </div>
+          </Grid>
         </Grid>
-      </Grid>
-      <hr className="footer-hr" />
-      <div className="copy-right">
-        <div>
-          <CLink href="/" style={{ color: "black" }}>
-            XShop
-          </CLink>
-          <span> &copy; 2024 creativeLabs.</span>
-        </div>
-        <div>
-          <span>Powered by</span>
-          <CLink href="/" style={{ color: "black" }}>
-            {" "}
-            NOVA
-          </CLink>
-        </div>
-      </div>
-    </CFooter>
+        <Divider sx={{ borderColor: "rgba(255,255,255,0.12)", my: 4 }} />
+        <Typography variant="body2" sx={{ color: "grey.400" }}>
+          <MuiLink component={Link} to="/" underline="hover" sx={{ color: "inherit", fontWeight: 700 }}>
+            Lumière
+          </MuiLink>{" "}
+          &copy; {currentYear}. All rights reserved.
+        </Typography>
+      </Container>
+    </Box>
   );
 };

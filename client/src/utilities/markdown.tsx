@@ -1,19 +1,13 @@
-import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-export const MarkdownComponent = ({ markdownContents }: any) => {
-  const [descriptions, setDescriptions] = useState<string[] | null>([]);
-  useEffect(() => {
-    setDescriptions(markdownContents);
-  }, [markdownContents]);
+interface MarkdownComponentProps {
+  markdownContents: string[];
+}
 
-  return descriptions ? (
-    <div>
-      {descriptions.map((description: string, index) => (
-        <ReactMarkdown key={index} children={description} />
-      ))}
-    </div>
-  ) : (
-    <></>
-  );
-};
+export const MarkdownComponent = ({ markdownContents }: MarkdownComponentProps) => (
+  <div>
+    {markdownContents.map((content, index) => (
+      <ReactMarkdown key={index}>{content}</ReactMarkdown>
+    ))}
+  </div>
+);

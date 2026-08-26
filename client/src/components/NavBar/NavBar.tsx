@@ -1,96 +1,93 @@
-import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { alpha, styled } from "@mui/material/styles";
 import {
-  AppBar,
-  Box,
-  Toolbar,
-  IconButton,
-  Typography,
-  InputBase,
-  Badge,
-  MenuItem,
-  Menu,
-} from "@mui/material";
-import {
-  Settings,
-  Logout,
-  CatchingPokemon,
-  ShoppingCart,
   AccountCircle,
-  Search as SearchIcon,
-  Store,
+  Notifications as NotificationsIcon,
   Person,
+  Receipt,
+  Search as SearchIcon,
+  ShoppingCart,
 } from "@mui/icons-material";
+import {
+  Avatar,
+  Badge,
+  Box,
+  ClickAwayListener,
+  IconButton,
+  InputBase,
+  List,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem as MuiMenuItem,
+  Paper,
+  Popper,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { ChangeEvent, MouseEvent, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
-import { OrderContext } from "../../contexts/OrderContext";
 import { useNavigate } from "react-router-dom";
-import { LoginContext } from "../../contexts/LoginContext";
 import toast from "react-hot-toast";
+import { fetchMenuItems } from "../../api/menu";
+import { useLogin } from "../../hooks/useLogin";
+import { useNotifications } from "../../hooks/useNotifications";
+import { useOrder } from "../../hooks/useOrder";
+import { useSearch } from "../../hooks/useSearch";
+import { PLACEHOLDER_IMAGE } from "../../lib/placeholderImage";
+import { MenuItem } from "../../type";
 import { SideBar } from "../SideBar/SideBar";
-import { SearchContext } from "../../contexts/SearchContext";
+
+const SEARCH_DEBOUNCE_MS = 400;
+const MAX_SUGGESTIONS = 5;
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
+  display: "flex",
+  alignItems: "center",
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: alpha(theme.palette.common.white, 0.18),
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.white, 0.28),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "80%",
-  textAlign: "left",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "80%",
-  },
+  width: "100%",
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
+  padding: theme.spacing(0, 1.5),
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  pointerEvents: "none",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
+  width: "100%",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
+    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
   },
 }));
 
 export const NavBar = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [, setCookie, removeCookie] = useCookies([
-    "access-token",
-    "isLoggedIn",
-  ]);
-  const { setSearchParams }: any = React.useContext(SearchContext);
-  const { isLoggedIn, setIsLoggedIn }: any = React.useContext(LoginContext);
-  const { orderItems }: any = React.useContext(OrderContext);
-  const [orderItemNumber, setOrderItemNumber]: any = React.useState<
-    number | null
-  >(0);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [, setCookie, removeCookie] = useCookies(["access-token", "refresh-token", "isLoggedIn"]);
+  const { setSearchParams } = useSearch();
+  const { isLoggedIn, setIsLoggedIn } = useLogin();
+  const { orderItems, setOrderItems } = useOrder();
+  const { notifications, unreadCount, markAllRead } = useNotifications();
   const navigate = useNavigate();
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [searchAnchorEl, setSearchAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [suggestions, setSuggestions] = useState<MenuItem[]>([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = useState<null | HTMLElement>(null);
 
-  React.useEffect(() => {
-    setOrderItemNumber(orderItems?.length);
-  }, [JSON.stringify(orderItems)]);
+  useEffect(() => () => clearTimeout(searchDebounceRef.current), []);
 
   const isMenuOpen = Boolean(anchorEl);
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileMenuOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -100,8 +97,10 @@ export const NavBar = () => {
 
   const handleLogout = () => {
     removeCookie("access-token");
+    removeCookie("refresh-token");
     setCookie("isLoggedIn", false, { path: "/", secure: true });
     setIsLoggedIn(false);
+    setOrderItems([]);
     toast.success("Logged Out!");
     navigate("/login");
     setAnchorEl(null);
@@ -111,142 +110,182 @@ export const NavBar = () => {
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       id={menuId}
       keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      slotProps={{
+        paper: {
+          variant: "outlined",
+          sx: { mt: 1, minWidth: 160 },
+        },
+      }}
     >
-      <MenuItem
-        onClick={() => {
-          navigate("/settings");
-          setAnchorEl(null);
-        }}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "10px",
-        }}
-      >
-        <Settings />
-        Setting
-      </MenuItem>
-      <MenuItem
-        onClick={handleLogout}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "10px",
-        }}
-      >
-        <Logout />
+      <MuiMenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
         Log out
-      </MenuItem>
+      </MuiMenuItem>
     </Menu>
   );
 
-  const renderIconWithUserLoggedIn = (
-    <Box sx={{ display: { xs: "none", md: "flex" } }}>
-      <IconButton
-        size="large"
-        aria-label="show n new orders"
-        color="inherit"
-        onClick={() => navigate("/orders/me")}
-      >
-        <Badge badgeContent={orderItemNumber} color="error">
-          <ShoppingCart />
-        </Badge>
-      </IconButton>
-      <IconButton
-        size="large"
-        edge="end"
-        aria-label="account of current user"
-        aria-controls={menuId}
-        aria-haspopup="true"
-        onClick={handleProfileMenuOpen}
-        color="inherit"
-      >
-        <AccountCircle />
-      </IconButton>
-    </Box>
-  );
+  const handleInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
 
-  const renderIconWithoutUserLoggedIn = (
-    <Box sx={{ display: { xs: "none", md: "flex" } }}>
-      <IconButton
-        size="small"
-        color="inherit"
-        aria-label="Login"
-        onClick={() => navigate("/login")}
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "10px",
-        }}
-      >
-        <Person />
-        Sign In
-      </IconButton>
-    </Box>
-  );
+    clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      setSearchParams(value);
 
-  const handleInputChanged = (event: any) => {
-    setSearchParams(event.target.value);
+      if (!value.trim()) {
+        setSuggestions([]);
+        setSuggestionsOpen(false);
+        return;
+      }
+
+      fetchMenuItems({ name: value, page: 1 })
+        .then((data) => {
+          setSuggestions(data.results.slice(0, MAX_SUGGESTIONS));
+          setSuggestionsOpen(true);
+        })
+        .catch((error) => console.error("Failed to fetch search suggestions:", error));
+    }, SEARCH_DEBOUNCE_MS);
   };
 
+  const handleSuggestionClick = (menuItem: MenuItem) => {
+    setSuggestionsOpen(false);
+    navigate(`/menu/${menuItem.id}`);
+  };
+
+  const notificationsOpen = Boolean(notificationsAnchorEl);
+
+  const handleNotificationsOpen = (event: MouseEvent<HTMLElement>) => {
+    setNotificationsAnchorEl(event.currentTarget);
+    markAllRead();
+  };
+
+  const handleNotificationsClose = () => setNotificationsAnchorEl(null);
+
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
+    <>
+      <Toolbar sx={{ gap: { xs: 0.5, sm: 1 } }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
           <SideBar />
           <Typography
             variant="h6"
             noWrap
             component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
+            onClick={() => navigate("/")}
+            sx={{ cursor: "pointer", letterSpacing: "0.04em" }}
           >
-            <IconButton
-              size="large"
-              color="inherit"
-              aria-label="Title"
-              onClick={() => navigate("/")}
-            >
-              <CatchingPokemon />
-              XSHOP
-            </IconButton>
+            Lumière
           </Typography>
-          <Search>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", flex: { xs: 1, sm: 2 }, maxWidth: 560, mx: "auto" }}>
+          <Search ref={setSearchAnchorEl} sx={{ width: "100%" }}>
             <SearchIconWrapper>
-              <SearchIcon />
+              <SearchIcon fontSize="small" />
             </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-              onChange={handleInputChanged}
-            />
+            <StyledInputBase placeholder="Search our menu…" inputProps={{ "aria-label": "search" }} onChange={handleInputChanged} />
           </Search>
-          <IconButton
-            size="medium"
-            color="inherit"
-            aria-label="Title"
-            onClick={() => navigate("/store")}
+          <Popper
+            open={suggestionsOpen && suggestions.length > 0}
+            anchorEl={searchAnchorEl}
+            placement="bottom-start"
+            sx={{ zIndex: (theme) => theme.zIndex.appBar + 1, width: { xs: 280, sm: "min(560px, 90vw)" } }}
           >
-            <Store />
-          </IconButton>
-          <Box sx={{ flexGrow: 1 }} />
-          {isLoggedIn
-            ? renderIconWithUserLoggedIn
-            : renderIconWithoutUserLoggedIn}
-        </Toolbar>
-      </AppBar>
+            <ClickAwayListener onClickAway={() => setSuggestionsOpen(false)}>
+              <Paper elevation={4} sx={{ mt: 0.5 }}>
+                <List dense disablePadding>
+                  {suggestions.map((menuItem) => (
+                    <ListItemButton key={menuItem.id} onClick={() => handleSuggestionClick(menuItem)}>
+                      <Avatar
+                        variant="rounded"
+                        src={menuItem.image_upload_url || PLACEHOLDER_IMAGE}
+                        alt={menuItem.name}
+                        sx={{ width: 36, height: 36, mr: 1.5 }}
+                      />
+                      <ListItemText primary={menuItem.name} secondary={`$${menuItem.price}`} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Paper>
+            </ClickAwayListener>
+          </Popper>
+        </Box>
+
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: { xs: 0, sm: 1 }, flex: 1 }}>
+          {isLoggedIn ? (
+            <>
+              <IconButton size="large" aria-label="notifications" color="inherit" onClick={handleNotificationsOpen}>
+                <Badge badgeContent={unreadCount} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <IconButton size="large" aria-label="order history" color="inherit" onClick={() => navigate("/orders/history")}>
+                <Receipt />
+              </IconButton>
+              <IconButton size="large" aria-label="cart" color="inherit" onClick={() => navigate("/orders/me")}>
+                <Badge badgeContent={orderItems.length} color="secondary">
+                  <ShoppingCart />
+                </Badge>
+              </IconButton>
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+            </>
+          ) : (
+            <IconButton size="medium" color="inherit" aria-label="Login" onClick={() => navigate("/login")}>
+              <Person />
+            </IconButton>
+          )}
+        </Box>
+      </Toolbar>
       {renderMenu}
-    </Box>
+
+      <Popper
+        open={notificationsOpen}
+        anchorEl={notificationsAnchorEl}
+        placement="bottom-end"
+        sx={{ zIndex: (theme) => theme.zIndex.appBar + 1, width: { xs: 300, sm: 360 } }}
+      >
+        <ClickAwayListener onClickAway={handleNotificationsClose}>
+          <Paper variant="outlined" sx={{ mt: 1, maxHeight: 420, overflowY: "auto" }}>
+            {notifications.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ p: 3, textAlign: "center" }}>
+                No notifications yet
+              </Typography>
+            ) : (
+              <List dense disablePadding>
+                {notifications.map((notification) => (
+                  <ListItemButton
+                    key={notification.id}
+                    onClick={() => {
+                      handleNotificationsClose();
+                      if (notification.order) {
+                        navigate("/orders/history");
+                      }
+                    }}
+                  >
+                    <ListItemText
+                      primary={notification.message}
+                      secondary={new Date(notification.created_at).toLocaleString()}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            )}
+          </Paper>
+        </ClickAwayListener>
+      </Popper>
+    </>
   );
 };

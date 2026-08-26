@@ -1,40 +1,33 @@
-import { Grid, IconButton, Typography } from '@mui/material';
-import PhoneIcon from '@mui/icons-material/Phone';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import EmailIcon from '@mui/icons-material/Email';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { Grid, Typography } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EmailIcon from "@mui/icons-material/Email";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import PhoneIcon from "@mui/icons-material/Phone";
+import { ComponentType } from "react";
 
-const GridContactInfo = (props: any) => {
-    const { Icon, content } = props;
-    return (
-        <>
-            <Grid item xs={2}>
-                <IconButton>
-                    <Icon />
-                </IconButton>
-            </Grid>
-            <Grid item xs={10}>
-                <Typography variant="body1">
-                    { content }
-                </Typography>
-            </Grid>
-        </>
-    );
+interface GridContactInfoProps {
+  Icon: ComponentType;
+  content: string;
 }
 
-export const ContactInfo = () => {
-    return (
-        <Grid container alignItems="center">
-            {/* Phone */}
-            <GridContactInfo Icon={PhoneIcon} content="+84329922595" />
-            {/* Facebook */}
-            <GridContactInfo Icon={FacebookIcon} content="Nguyen Viet Anh" />
-            {/* Email */}
-            <GridContactInfo Icon={EmailIcon} content="vietanhhd03@gmail.com" />
-            {/* GitHub */}
-            <GridContactInfo Icon={GitHubIcon} content="N0VA" />
-        </Grid>
-    );
-};
+const GridContactInfo = ({ Icon, content }: GridContactInfoProps) => (
+  <>
+    <Grid size={2}>
+      <Icon />
+    </Grid>
+    <Grid size={10}>
+      <Typography variant="body2" sx={{ color: "grey.400" }}>
+        {content}
+      </Typography>
+    </Grid>
+  </>
+);
 
-export default ContactInfo;
+export const ContactInfo = () => (
+  <Grid container spacing={1} sx={{ alignItems: "center", color: "grey.400" }}>
+    <GridContactInfo Icon={LocationOnIcon} content="24 Rue de la Lumière, Paris 75008" />
+    <GridContactInfo Icon={PhoneIcon} content="+33 1 40 00 00 00" />
+    <GridContactInfo Icon={EmailIcon} content="reservations@lumiere-restaurant.com" />
+    <GridContactInfo Icon={AccessTimeIcon} content="Tue–Sun, 6:00 PM – 11:00 PM" />
+  </Grid>
+);

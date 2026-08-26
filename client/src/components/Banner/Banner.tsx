@@ -1,35 +1,134 @@
-import "./Banner.css";
-import { useState, useEffect } from "react";
+import { Box, Button, Container, Fade, IconButton, Typography } from "@mui/material";
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { categoryPath } from "../../constants/menuCategories";
+
+const AUTO_ADVANCE_MS = 6000;
+const SLIDE_HEIGHT = { xs: 480, sm: 560, md: 620 };
+
+interface Slide {
+  eyebrow: string;
+  title: string;
+  body: string;
+  ctaLabel: string;
+  ctaTo: string;
+  image?: string;
+}
+
+const slides: Slide[] = [
+  {
+    eyebrow: "Fine Dining",
+    title: "Lumière",
+    body: "Modern European cuisine crafted with seasonal ingredients, served in an atmosphere of quiet elegance.",
+    ctaLabel: "View Menu",
+    ctaTo: "/menu",
+    image: "https://images.unsplash.com/photo-1651440204216-548382747b40?w=1600&h=900&fit=crop&auto=format&q=80",
+  },
+  {
+    eyebrow: "For the Table",
+    title: "Tasting Menu for Two",
+    body: "Five courses built around what's best this week, with wine pairing suggestions. A shared evening, done properly.",
+    ctaLabel: "View Combos & Set Menus",
+    ctaTo: categoryPath("Combos & Set Menus"),
+    image: "https://images.unsplash.com/photo-1663530761401-15eefb544889?w=1600&h=900&fit=crop&auto=format&q=80",
+  },
+  {
+    eyebrow: "Join Us",
+    title: "An Evening at Lumière",
+    body: "Private dining, weekend tables, or a quiet dinner for two — we recommend booking ahead.",
+    ctaLabel: "Reserve a Table",
+    image: "https://images.unsplash.com/photo-1760533536461-714a23877e2d?w=1600&h=900&fit=crop&auto=format&q=80",
+    ctaTo: "/contact",
+  },
+];
 
 export const Banner = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = [
-    "https://t4.ftcdn.net/jpg/03/32/95/71/360_F_332957101_NV588R5pQUyusBU22Wvzqqhq3E7pOPwb.jpg",
-    "https://www.gloo.com.my/image/catalog/09promotion/202306/nologo_MNC_Summer_Gloo_banner_1090x450.jpg",
-    "https://www.businessinsider.in/photo/99964822/amazon-great-summer-sale-best-deals-on-smartphones.jpg?imgsize=101558",
-    "https://www.garmin.co.in/m/in/g/news/news-2023-apr-summer-sale.jpg",
-  ];
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000);
+    const timer = setInterval(() => {
+      setIndex((current) => (current + 1) % slides.length);
+    }, AUTO_ADVANCE_MS);
+    return () => clearInterval(timer);
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [images.length]);
+  const goTo = (nextIndex: number) => setIndex((nextIndex + slides.length) % slides.length);
 
   return (
-    <div className="banner">
-      <img
-        src={images[currentImageIndex]}
-        alt="Banner"
-        className="banner-image"
-        onError={(e: any) => {
-          e.target.onerror = null;
-          e.target.src =
-            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAO0AAADVCAMAAACMuod9AAAAVFBMVEXu7u5mZmbx8fFbW1vAwMDIyMj29vaFhYXz8/PT09Ojo6NZWVmxsbGBgYFjY2NgYGDn5+fY2Nh3d3fQ0NCdnZ1sbGzh4eF7e3tSUlJra2uOjo7d3d3UXWnYAAACyElEQVR4nO3b63aaQBSGYR2sDrEBD2Da5v7vs4AgCKNmhUnT/fq9P0NEnszm4FpmsXii3HcfwD9NWm7ScpOWm7TcpOUmLTdpuUnLTVpu0nKTlpu03KTlJi03ablJy01abtJyk5abtNyk5SYtN2m5SctNWm7ScpOWm7TcpOUmLTdpuUnLTVpu0nKTlpu03KTlJi03abl9gdZFK/6hxd/j/kesdtGPLfYOF77YJnH6lcY+ui/QvuSHTYzKxIR2+3Mdo9etEa2PsB8n7dx9Rt6ftJ9L2tn7jLw/ae++/80HRJ7Wrd9XqzT82zitO22SPE8OQS9Ou/udL6uyPMSiadd/GmzFLQMvgGndqcUul8lxehw07fGizQOvkHZu3zrJSafd4ibZ7cbvBb5K+WN5HP/4VELvQH6fZdn4KaJ+ukjyLe7pwqd5Vl2MJlzfPDkGD8Ku1qXLrB7Z5WSYgZ8K6jE+X44mw3w7q1qfttgH3OuLtlGtP49xx50Mc3ckRXnFtan1+wG2PnfDq+uLJD8MuSa1l3O2X9196HZcVLfebMi1qHXpCFt7p6tbrWyzZcA1qB2N8a1hXhftI/OAa0/rxmMcHmZfXD4f9Fxz2sk523OHkAG2et7quNa0LjTG02G+wvara0wbPGd7bjfM/iW53pS/NVxb2jsrO1zd5tYz2tSsrintA2zHHY1xu7qHnS3t3THuhzmIPQ+zt6N9uLItd3zODrh2tOuPYGvU5Jy9bDksNla07x/D3v1DvL7Z0CZFORtbP4HY+AZRHsFaZ0QbByvtzKSdl7TSQrRP9f1kl65iZeC758/1fwX/c9Jyk5abtNyk5SYtN2m5SctNWm7ScpOWm7TcpOUmLTdpuUnLTVpu0nKTlpu03KTlJi03ablJy01abtJyk5abtNyk5SYtN2m5SctNWm7ScpOWm7TcpOUmLTdpuUnL7cm0fwHDUS1mjADeeAAAAABJRU5ErkJggg==";
-        }}
-      />
-    </div>
+    <Box sx={{ position: "relative", height: SLIDE_HEIGHT, bgcolor: "primary.main", overflow: "hidden" }}>
+      {slides.map((slide, slideIndex) => (
+        <Fade key={slide.title} in={slideIndex === index} timeout={600}>
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              color: "primary.contrastText",
+              backgroundImage: slide.image
+                ? `linear-gradient(0deg, rgba(28,22,17,0.75), rgba(28,22,17,0.55)), url(${slide.image})`
+                : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <Container maxWidth="md">
+              <Box sx={{ textAlign: "center" }}>
+                <Typography variant="overline" sx={{ color: "secondary.main", display: "block", mb: 2 }}>
+                  {slide.eyebrow}
+                </Typography>
+                <Typography variant="h2" sx={{ fontSize: { xs: "2.25rem", md: "3.25rem" }, mb: 3 }}>
+                  {slide.title}
+                </Typography>
+                <Box sx={{ width: 80, height: 2, bgcolor: "secondary.main", mx: "auto", mb: 3 }} />
+                <Typography variant="body1" sx={{ mb: 5, opacity: 0.9, maxWidth: 480, mx: "auto" }}>
+                  {slide.body}
+                </Typography>
+                <Button component={Link} to={slide.ctaTo} variant="contained" color="secondary" size="large">
+                  {slide.ctaLabel}
+                </Button>
+              </Box>
+            </Container>
+          </Box>
+        </Fade>
+      ))}
+
+      <IconButton
+        aria-label="Previous slide"
+        onClick={() => goTo(index - 1)}
+        sx={{ position: "absolute", top: "50%", left: { xs: 4, sm: 16 }, transform: "translateY(-50%)", color: "#fff" }}
+      >
+        <KeyboardArrowLeft />
+      </IconButton>
+      <IconButton
+        aria-label="Next slide"
+        onClick={() => goTo(index + 1)}
+        sx={{ position: "absolute", top: "50%", right: { xs: 4, sm: 16 }, transform: "translateY(-50%)", color: "#fff" }}
+      >
+        <KeyboardArrowRight />
+      </IconButton>
+
+      <Box sx={{ position: "absolute", bottom: 16, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 1 }}>
+        {slides.map((slide, slideIndex) => (
+          <Box
+            key={slide.title}
+            component="button"
+            aria-label={`Go to slide ${slideIndex + 1}`}
+            onClick={() => goTo(slideIndex)}
+            sx={{
+              width: slideIndex === index ? 20 : 8,
+              height: 8,
+              borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
+              bgcolor: slideIndex === index ? "secondary.main" : "rgba(255,255,255,0.4)",
+              transition: "width 0.2s ease, background-color 0.2s ease",
+              p: 0,
+            }}
+          />
+        ))}
+      </Box>
+    </Box>
   );
 };
