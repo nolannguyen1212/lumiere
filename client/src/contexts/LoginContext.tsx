@@ -1,17 +1,10 @@
-import { createContext, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { useCookies } from "react-cookie";
+import { LoginContext } from "./login-context";
 
-export const LoginContext = createContext({});
+export const LoginProvider = ({ children }: PropsWithChildren) => {
+  const [cookies] = useCookies(["isLoggedIn"]);
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(cookies["isLoggedIn"]));
 
-export const LoginProvider = ({ children }: any) => {
-  const [cookies, ,] = useCookies(["isLoggedIn"]);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(
-    cookies["isLoggedIn"] ? cookies["isLoggedIn"] : false
-  );
-
-  return (
-    <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
-      {children}
-    </LoginContext.Provider>
-  );
+  return <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>{children}</LoginContext.Provider>;
 };

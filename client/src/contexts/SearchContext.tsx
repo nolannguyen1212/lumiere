@@ -1,13 +1,8 @@
-import { createContext, useState } from "react";
+import { PropsWithChildren, useState } from "react";
+import { SearchContext } from "./search-context";
 
-export const SearchContext = createContext({});
+export const SearchProvider = ({ children }: PropsWithChildren) => {
+  const [searchParams, setSearchParams] = useState("");
 
-export const SearchProvider = ({ children }: any) => {
-  const [searchParams, setSearchParams] = useState<string | null>("");
-
-  return (
-    <SearchContext.Provider value={{ searchParams, setSearchParams }}>
-      {children}
-    </SearchContext.Provider>
-  );
+  return <SearchContext.Provider value={{ searchParams, setSearchParams }}>{children}</SearchContext.Provider>;
 };

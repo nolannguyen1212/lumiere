@@ -1,38 +1,28 @@
-import axios from "axios";
-import { createContext, useEffect, useState } from "react";
-import { Order } from "../type";
-import { useCookies } from "react-cookie";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { fetchOrderItems } from "../api/orderItems";
+import { useLogin } from "../hooks/useLogin";
+import { OrderItem } from "../type";
+import { OrderContext } from "./order-context";
 
-export const OrderContext = createContext({});
+export const OrderProvider = ({ children }: PropsWithChildren) => {
+  const { isLoggedIn } = useLogin();
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [refreshCount, setRefreshCount] = useState(0);
 
-export const OrderProvider = ({ children }: any) => {
-  const [orderItems, setOrderItems] = useState<Order[] | null>([]);
-  const [cookies, ,] = useCookies(["access-token"]);
+  const refreshOrderItems = () => setRefreshCount((count) => count + 1);
 
   useEffect(() => {
-    const getOrderItems = async () => {
-      try {
-        const url = import.meta.env.VITE_API_ROOT + "/api/order-items";
-        const headers = {
-          Authorization: "Bearer " + cookies["access-token"],
-        };
-        const response = await axios({
-          method: "GET",
-          url: url,
-          headers: headers,
-        });
-        const responseData = response.data["order_items"];
-        setOrderItems(responseData);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
+    if (!isLoggedIn) {
+      return;
+    }
 
-    getOrderItems();
-  }, [JSON.stringify(orderItems)]); // avoid reloading everytime because objects are always different.
+    fetchOrderItems()
+      .then(setOrderItems)
+      .catch((error) => console.error("Failed to fetch order items:", error));
+  }, [isLoggedIn, refreshCount]);
 
   return (
-    <OrderContext.Provider value={{ orderItems, setOrderItems }}>
+    <OrderContext.Provider value={{ orderItems, setOrderItems, refreshOrderItems }}>
       {children}
     </OrderContext.Provider>
   );
