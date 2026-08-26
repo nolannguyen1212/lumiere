@@ -20,6 +20,9 @@ def env_list(name: str) -> list[str]:
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 DATE_INPUT_FORMATS = ["%d-%m-%Y"]
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -57,6 +60,7 @@ CHANNEL_LAYERS = {
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -125,11 +129,14 @@ SPECTACULAR_SETTINGS = {
 }
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+FRONTEND_BUILD_DIR = BASE_DIR / "client" / "build"
+if FRONTEND_BUILD_DIR.is_dir():
+    WHITENOISE_ROOT = FRONTEND_BUILD_DIR
 
 SITE_URL = os.getenv("SITE_URL")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")

@@ -9,6 +9,6 @@ ALLOWED_HOSTS = env_list("ALLOWED_HOSTS")  # noqa: F405
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.getenv("DATABASE_NAME") or BASE_DIR / "db.sqlite3",  # noqa: F405
+        "NAME": os.getenv("DATABASE_NAME") or DATA_DIR / "db.sqlite3",  # noqa: F405
     }
 }
