@@ -52,7 +52,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Preset Image Name
-        run: echo "FE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/feshop:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "FE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/lumiere-fe:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
@@ -64,10 +64,8 @@ jobs:
           build-args: |
             VITE_API_ROOT=${{ vars.VITE_API_ROOT }}
             VITE_STRIPE_PK=${{ vars.VITE_STRIPE_PK }}
-            VITE_FLOWISE_CHATFLOW_ID=${{ vars.VITE_FLOWISE_CHATFLOW_ID }}
-            VITE_FLOWISE_API_HOST=${{ vars.VITE_FLOWISE_API_HOST }}
 
-      - name: Deploy Image to CapRrover
+      - name: Deploy Image to CapRover
         uses: caprover/deploy-from-github@v1.1.2
         with:
           server: "${{ secrets.CAPROVER_SERVER }}"
@@ -92,7 +90,7 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Preset Image Name
-        run: echo "BE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/beshop:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "BE_IMAGE_URL=$(echo ghcr.io/${{ github.repository_owner }}/lumiere-be:$(echo ${{ github.sha }} | cut -c1-7) | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@v4
@@ -102,7 +100,7 @@ jobs:
           push: true
           tags: ${{ env.BE_IMAGE_URL }}
 
-      - name: Deploy Image to CapRrover
+      - name: Deploy Image to CapRover
         uses: caprover/deploy-from-github@v1.1.2
         with:
           server: "${{ secrets.CAPROVER_SERVER }}"

@@ -18,8 +18,8 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: xshop
-          MYSQL_USER: nova
+          MYSQL_DATABASE: lumiere
+          MYSQL_USER: lumiere
           MYSQL_PASSWORD: password
         ports:
           - 3306:3306
@@ -38,21 +38,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Setup Virtualenv
-        run: |
-          python -m pip install --upgrade pip
-          pip install pipenv
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          pipenv install --dev
+        run: uv sync
 
       - name: Setup Variables Env
         run: |
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" > .env
           echo "DATABASE_ENGINE=django.db.backends.mysql" >> .env
-          echo "DATABASE_NAME=xshop" >> .env
-          echo "DATABASE_USER=nova" >> .env
+          echo "DATABASE_NAME=lumiere" >> .env
+          echo "DATABASE_USER=lumiere" >> .env
           echo "DATABASE_PASSWORD=password" >> .env
           echo "DATABASE_HOST=127.0.0.1" >> .env
           echo "DATABASE_PORT=3306" >> .env
@@ -62,7 +61,7 @@ jobs:
           timeout=60
           counter=0
           echo "Waiting for MySQL..."
-          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u nova --password=password --silent; do
+          while ! mysqladmin ping -h 127.0.0.1 -P 3306 -u lumiere --password=password --silent; do
             if [ $counter -gt $timeout ]; then
               echo "MySQL connection timed out!"
               exit 1
@@ -75,10 +74,10 @@ jobs:
 
       - name: Grant Database Privileges
         run: |
-          mysql -h 127.0.0.1 -P 3306 -u root -ppassword -e "GRANT ALL PRIVILEGES ON *.* TO 'nova'@'%'; FLUSH PRIVILEGES;"
+          mysql -h 127.0.0.1 -P 3306 -u root -ppassword -e "GRANT ALL PRIVILEGES ON *.* TO 'lumiere'@'%'; FLUSH PRIVILEGES;"
 
       - name: Run migrations
-        run: pipenv run python manage.py migrate
+        run: uv run python manage.py migrate
 
       - name: Run tests
-        run: pipenv run python manage.py test tests
+        run: uv run python manage.py test tests
