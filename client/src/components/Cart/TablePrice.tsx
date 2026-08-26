@@ -1,145 +1,140 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
-import { useContext, useEffect, useState } from "react";
-import { OrderContext } from "../../contexts/OrderContext";
-import { NumberInput } from "../NumberInput/NumberInput";
-import { useCookies } from "react-cookie";
-import axios from "axios";
+import { Add, Close, Remove, ShoppingBag } from "@mui/icons-material";
+import { Avatar, Box, Divider, IconButton, Link as MuiLink, Paper, Stack, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+import { deleteOrderItem, updateOrderItemQuantity } from "../../api/orderItems";
+import { useOrder } from "../../hooks/useOrder";
+import { PLACEHOLDER_IMAGE } from "../../lib/placeholderImage";
 import { truncate } from "../../utilities/truncate";
 
-const TAX_RATE = 0.1;
-
-function ccyFormat(num: number) {
-  return num ? `${num.toFixed(2)}` : 0;
+interface QuantityStepperProps {
+  quantity: number;
+  onChange: (quantity: number) => void;
 }
 
+const QuantityStepper = ({ quantity, onChange }: QuantityStepperProps) => (
+  <Stack direction="row" sx={{ alignItems: "center", border: "1px solid", borderColor: "divider", borderRadius: 1 }}>
+    <IconButton size="small" aria-label="Decrease quantity" onClick={() => onChange(quantity - 1)}>
+      <Remove fontSize="small" />
+    </IconButton>
+    <Typography sx={{ minWidth: 24, textAlign: "center" }}>{quantity}</Typography>
+    <IconButton size="small" aria-label="Increase quantity" onClick={() => onChange(quantity + 1)}>
+      <Add fontSize="small" />
+    </IconButton>
+  </Stack>
+);
+
 export const TablePrice = () => {
-  const { orderItems, setOrderItems }: any = useContext(OrderContext);
-  const [invoiceSubtotal, setInvoiceSubtotal] = useState(0);
-  const [invoiceTaxes, setInvoiceTaxes] = useState(0);
-  const [invoiceTotal, setInvoiceTotal] = useState(0);
-  const [cookies, ,] = useCookies(["access-token"]);
+  const { orderItems, refreshOrderItems } = useOrder();
 
-  useEffect(() => {
-    const tempInvoiceSubtotal = orderItems.reduce(
-      (accumulator: any, item: any) => accumulator + item.total_price,
-      0
-    );
-    const tempInvoiceTaxes = tempInvoiceSubtotal * TAX_RATE;
-    const tempInvoiceTotal = tempInvoiceSubtotal + tempInvoiceTaxes;
-    setInvoiceSubtotal(tempInvoiceSubtotal);
-    setInvoiceTaxes(tempInvoiceTaxes);
-    setInvoiceTotal(tempInvoiceTotal);
-  }, [JSON.stringify(orderItems)]);
-
-  const handleChangeQuantity = async (
-    _event: any,
-    orderItem: any,
-    value: any
-  ) => {
+  const handleChangeQuantity = async (orderItemId: string, quantity: number) => {
     try {
-      const url = import.meta.env.VITE_API_ROOT + "/api/order-items";
-      const headers = {
-        Authorization: "Bearer " + cookies["access-token"],
-      };
-      const data = {
-        id: orderItem.id,
-        quantity: value,
-      };
-
-      await axios({
-        method: "PUT",
-        url: url,
-        headers: headers,
-        data: data,
-      });
-
-      if (value) {
-        setOrderItems((prevOrderItems: any[]) => {
-          const updatedOrderItems = prevOrderItems.map((item) =>
-            item.id === orderItem.id
-              ? {
-                  ...item,
-                  quantity: value,
-                  total_price: value * item.unit_price,
-                }
-              : item
-          );
-          return updatedOrderItems;
-        });
+      if (quantity <= 0) {
+        await deleteOrderItem(orderItemId);
       } else {
-        setOrderItems(orderItems.filter((item: any) => item != orderItem));
+        await updateOrderItemQuantity(orderItemId, quantity);
       }
+      refreshOrderItems();
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Failed to update item quantity:", error);
     }
   };
 
+  const handleRemove = async (orderItemId: string) => {
+    try {
+      await deleteOrderItem(orderItemId);
+      refreshOrderItems();
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    }
+  };
+
+  if (orderItems.length === 0) {
+    return (
+      <Paper variant="outlined" sx={{ p: { xs: 4, sm: 6 }, textAlign: "center" }}>
+        <ShoppingBag sx={{ fontSize: 48, color: "text.secondary", mb: 2 }} />
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+          Your order is empty
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Browse our menu and add a dish you like.
+        </Typography>
+        <MuiLink component={Link} to="/menu" underline="none">
+          <Typography sx={{ fontWeight: 700, color: "secondary.dark" }}>View Menu</Typography>
+        </MuiLink>
+      </Paper>
+    );
+  }
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 1200 }} aria-label="table price">
-        <TableHead>
-          <TableRow>
-            <TableCell align="center" colSpan={3}>
-              Details
-            </TableCell>
-            <TableCell align="right">Price</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Items</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Qantity.</TableCell>
-            <TableCell align="right">Sum</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {orderItems
-            ? orderItems.map((orderItem: any) => (
-                <TableRow key={orderItem.id}>
-                  <TableCell>{truncate(orderItem.name, 35)}</TableCell>
-                  <TableCell align="right">${orderItem.unit_price}</TableCell>
-                  <TableCell align="right" sx={{ maxWidth: 2 }}>
-                    <NumberInput
-                      aria-label="quantity"
-                      placeholder="Type a number…"
-                      value={orderItem.quantity}
-                      onChange={(event, value) =>
-                        handleChangeQuantity(event, orderItem, value)
-                      }
-                      readOnly
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    ${ccyFormat(orderItem.total_price)}
-                  </TableCell>
-                </TableRow>
-              ))
-            : null}
-          <TableRow>
-            <TableCell rowSpan={3} />
-            <TableCell colSpan={2}>Subtotal</TableCell>
-            <TableCell align="right">${ccyFormat(invoiceSubtotal)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Tax</TableCell>
-            <TableCell align="right">{`${(TAX_RATE * 100).toFixed(
-              0
-            )} %`}</TableCell>
-            <TableCell align="right">${ccyFormat(invoiceTaxes)}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell colSpan={2}>Total</TableCell>
-            <TableCell align="right">${ccyFormat(invoiceTotal)}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Paper variant="outlined">
+      {orderItems.map((orderItem, index) => (
+        <Box key={orderItem.id}>
+          <Stack spacing={1.5} sx={{ p: { xs: 2, sm: 3 } }}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+              <Avatar
+                variant="rounded"
+                src={orderItem.image_upload_url || PLACEHOLDER_IMAGE}
+                alt={orderItem.name}
+                sx={{ width: 64, height: 64 }}
+              />
+
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontWeight: 700 }}>{truncate(orderItem.name, 45)}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  ${orderItem.unit_price} each
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                <QuantityStepper
+                  quantity={orderItem.quantity}
+                  onChange={(quantity) => handleChangeQuantity(orderItem.id, quantity)}
+                />
+              </Box>
+
+              <Typography
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  fontWeight: 700,
+                  color: "secondary.dark",
+                  minWidth: 72,
+                  textAlign: "right",
+                }}
+              >
+                ${orderItem.total_price.toFixed(2)}
+              </Typography>
+
+              <IconButton
+                size="small"
+                aria-label="Remove item"
+                onClick={() => handleRemove(orderItem.id)}
+                sx={{ display: { xs: "none", sm: "inline-flex" } }}
+              >
+                <Close fontSize="small" />
+              </IconButton>
+            </Stack>
+
+            <Stack
+              direction="row"
+              sx={{ display: { xs: "flex", sm: "none" }, alignItems: "center", justifyContent: "space-between", pl: "80px" }}
+            >
+              <QuantityStepper
+                quantity={orderItem.quantity}
+                onChange={(quantity) => handleChangeQuantity(orderItem.id, quantity)}
+              />
+              <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                <Typography sx={{ fontWeight: 700, color: "secondary.dark" }}>
+                  ${orderItem.total_price.toFixed(2)}
+                </Typography>
+                <IconButton size="small" aria-label="Remove item" onClick={() => handleRemove(orderItem.id)}>
+                  <Close fontSize="small" />
+                </IconButton>
+              </Stack>
+            </Stack>
+          </Stack>
+          {index < orderItems.length - 1 && <Divider />}
+        </Box>
+      ))}
+    </Paper>
   );
 };

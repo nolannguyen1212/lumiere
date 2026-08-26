@@ -1,57 +1,26 @@
-import React, { useContext, useState } from "react";
-import {
-  AddressElement,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+import { FormEvent, useState } from "react";
+import { AddressElement, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { Avatar, Button, Divider, Grid, Paper, Stack, Typography } from "@mui/material";
 import toast from "react-hot-toast";
-import { Heading } from "../../components/Heading";
-import { Button } from "../../components/Button";
-import "./PaymentForm.css";
-import { useCookies } from "react-cookie";
-import axios from "axios";
-import { OrderContext } from "../../contexts/OrderContext";
-
-const TAX_RATE = 0.1;
+import { completeCurrentOrder } from "../../api/orders";
+import { computeCartTotals, TAX_RATE_PERCENT } from "../../lib/cart";
+import { useOrder } from "../../hooks/useOrder";
+import { PLACEHOLDER_IMAGE } from "../../lib/placeholderImage";
 
 interface CheckoutFormProps {
   handleSetPaymentSuccess: () => void;
 }
 
-export const CheckoutForm: React.FC<CheckoutFormProps> = ({
-  handleSetPaymentSuccess,
-}) => {
+export const CheckoutForm = ({ handleSetPaymentSuccess }: CheckoutFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [cookies, setCookie] = useCookies(["access-token", "order_items"]);
-  const { orderItems, setOrderItems }: any = useContext(OrderContext);
+  const { orderItems, refreshOrderItems } = useOrder();
 
-  const totalCartValue = (orderItems: any) => {
-    const tempInvoiceSubtotal = orderItems.reduce(
-      (accumulator: any, item: any) => accumulator + item.total_price,
-      0
-    );
-    const tempInvoiceTaxes = tempInvoiceSubtotal * TAX_RATE;
-    const tempInvoiceTotal = tempInvoiceSubtotal + tempInvoiceTaxes;
-    return tempInvoiceTotal;
-  };
+  const { subtotal, tax, total } = computeCartTotals(orderItems);
 
-  const saveAndRemoveOrder = async () => {
-    const url = import.meta.env.VITE_API_ROOT + "/api/orders";
-    const headers = {
-      Authorization: "Bearer " + cookies["access-token"],
-    };
-    await axios({
-      method: "PUT",
-      url: url,
-      headers: headers,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
 
     if (!stripe || !elements) {
       return;
@@ -59,79 +28,97 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
     setIsLoading(true);
 
-    stripe
-      .confirmPayment({
-        elements,
-        redirect: "if_required",
-      })
-      .then((result) => {
-        if (!result.error) {
-          toast.success("Checkout Success");
-          saveAndRemoveOrder();
-          setOrderItems([]);
-          setCookie("order_items", "");
-          handleSetPaymentSuccess();
-        }
+    const result = await stripe.confirmPayment({
+      elements,
+      redirect: "if_required",
+    });
 
-        setIsLoading(false);
-      });
+    if (!result.error) {
+      toast.success("Checkout Success");
+      await completeCurrentOrder();
+      refreshOrderItems();
+      handleSetPaymentSuccess();
+    }
+
+    setIsLoading(false);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      id="payment-form"
-      style={{ marginBottom: "1.5rem" }}
-    >
-      <div style={{ marginBottom: "1.5rem" }}>
-        <Heading title="Enter your details to complete checkout!" center />
-      </div>
-      <h2
-        style={{
-          fontWeight: "bold",
-          marginTop: "1rem",
-          marginBottom: "0.5rem",
-        }}
-      >
-        Address Information
-      </h2>
-      <AddressElement
-        options={{
-          mode: "shipping",
-          allowedCountries: ["US", "VN"],
-        }}
-      />
-      <h2
-        style={{
-          fontWeight: "bold",
-          marginTop: "1rem",
-          marginBottom: "0.5rem",
-        }}
-      >
-        Payment Information
-      </h2>
-      <PaymentElement
-        id="payment-element"
-        options={{
-          layout: "tabs",
-        }}
-      />
-      <div
-        style={{
-          padding: "1rem",
-          textAlign: "center",
-          color: "#778899",
-          fontSize: "1.5rem",
-          fontWeight: "bold",
-        }}
-      >
-        Total: ${totalCartValue(orderItems)}
-      </div>
-      <Button
-        label={isLoading ? "Processing" : "Pay now"}
-        disabled={isLoading || !stripe || !elements}
-        onClick={() => {}}
-      />
-    </form>
+    <Grid container spacing={4} component="form" onSubmit={handleSubmit}>
+      <Grid size={{ xs: 12, md: 7 }}>
+        <Stack spacing={3}>
+          <Paper variant="outlined" sx={{ p: { xs: 3, sm: 4 } }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Delivery Details
+            </Typography>
+            <AddressElement options={{ mode: "shipping", allowedCountries: ["US", "VN"] }} />
+          </Paper>
+          <Paper variant="outlined" sx={{ p: { xs: 3, sm: 4 } }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Payment
+            </Typography>
+            <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
+          </Paper>
+        </Stack>
+      </Grid>
+
+      <Grid size={{ xs: 12, md: 5 }}>
+        <Paper variant="outlined" sx={{ p: { xs: 3, sm: 4 }, position: { md: "sticky" }, top: { md: 96 } }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Order Summary
+          </Typography>
+          <Stack spacing={1.5} sx={{ mb: 2 }}>
+            {orderItems.map((item) => (
+              <Stack key={item.id} direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+                <Avatar
+                  variant="rounded"
+                  src={item.image_upload_url || PLACEHOLDER_IMAGE}
+                  alt={item.name}
+                  sx={{ width: 40, height: 40 }}
+                />
+                <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+                  {item.name} × {item.quantity}
+                </Typography>
+                <Typography variant="body2">${item.total_price.toFixed(2)}</Typography>
+              </Stack>
+            ))}
+          </Stack>
+          <Divider sx={{ mb: 2 }} />
+          <Stack spacing={1}>
+            <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+              <Typography variant="body2" color="text.secondary">
+                Subtotal
+              </Typography>
+              <Typography variant="body2">${subtotal.toFixed(2)}</Typography>
+            </Stack>
+            <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+              <Typography variant="body2" color="text.secondary">
+                Tax ({TAX_RATE_PERCENT.toFixed(0)}%)
+              </Typography>
+              <Typography variant="body2">${tax.toFixed(2)}</Typography>
+            </Stack>
+            <Divider />
+            <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                Total
+              </Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "secondary.dark" }}>
+                ${total.toFixed(2)}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            fullWidth
+            disabled={isLoading || !stripe || !elements}
+            sx={{ mt: 3 }}
+          >
+            {isLoading ? "Processing…" : "Pay Now"}
+          </Button>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
